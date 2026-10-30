@@ -76,6 +76,2471 @@
 
       <form onsubmit="handleAuthLogin(event)" class="space-y-4 pt-1">
         <div>
+          <label class="block text-xs font-semibold text-slate-300 text-left mb-1.5">Owner Passcode / Password</label>
+          <div class="relative">
+            <input 
+              type="password" 
+              id="auth-passcode-input" 
+              placeholder="Enter PIN / Password..." 
+              required
+              autocomplete="current-password"
+              class="w-full px-4 py-2.5 bg-slate-800/90 text-white text-sm tracking-widest font-mono rounded-xl border border-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 focus:outline-none transition-all placeholder:text-slate-500"
+            >
+          </div>
+          <p id="auth-error-msg" class="text-[11px] text-rose-400 mt-1.5 hidden font-medium">Incorrect passcode. Please try again.</p>
+        </div>
+
+        <button 
+          type="submit" 
+          class="w-full py-2.5 px-4 bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-amber-900/30 transition-all flex items-center justify-center gap-2"
+        >
+          <i data-lucide="lock-open" class="w-4 h-4"></i>
+          <span>Unlock Workspace</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Top Navigation Bar -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div id="header-brand-container" class="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center shrink-0 shadow-sm border border-amber-200/70 bg-[#c8881b]">
+          <div id="header-brand-icon" class="w-full h-full flex items-center justify-center">
+            <!-- Byeol Tara Gold Star Medallion Emblem -->
+            <svg class="w-full h-full p-0.5" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="48" fill="#bc821e"/>
+              <circle cx="50" cy="50" r="45" stroke="#fef08a" stroke-width="1.5" stroke-opacity="0.9"/>
+              <circle cx="50" cy="50" r="41" stroke="#fde047" stroke-width="0.8" stroke-dasharray="2 1.5"/>
+              <circle cx="50" cy="50" r="28" stroke="#fef08a" stroke-width="1"/>
+              <!-- Multi-pointed Byeol Star -->
+              <g transform="translate(50, 50) scale(0.68)">
+                <path d="M0 -34 L5 -12 L24 -24 L12 -5 L34 0 L12 5 L24 24 L5 12 L0 34 L-5 12 L-24 24 L-12 5 L-34 0 L-12 -5 L-24 -24 L-5 -12 Z" fill="#fffbeb" stroke="#ca8a04" stroke-width="0.8"/>
+                <path d="M0 -22 L3 -8 L16 -16 L8 -3 L22 0 L8 3 L16 16 L3 8 L0 22 L-3 8 L-16 16 L-8 3 L-22 0 L-8 -3 L-16 -16 L-3 -8 Z" fill="#facc15" stroke="#b45309" stroke-width="0.6"/>
+                <circle cx="0" cy="0" r="3.5" fill="#fef08a"/>
+              </g>
+              <text x="50" y="87" text-anchor="middle" font-family="'Plus Jakarta Sans', serif" font-weight="800" font-size="7.5" fill="#fffbeb" letter-spacing="1.5">BYT</text>
+            </svg>
+          </div>
+          <img id="header-brand-img" src="" alt="Logo" class="w-full h-full object-cover hidden" onerror="this.classList.add('hidden'); document.getElementById('header-brand-icon').classList.remove('hidden');">
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span id="header-business-name" class="text-base sm:text-lg font-bold tracking-tight text-slate-900">Byeol <span class="theme-accent-text">Tara</span> <span class="text-xs font-normal text-slate-400">별 तारा</span></span>
+            <span id="header-tagline-badge" class="hidden sm:inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200/60">Dainty & Boho Silver</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Navigation Tabs -->
+      <nav class="hidden md:flex items-center space-x-1 bg-slate-100 p-1 rounded-xl">
+        <button onclick="switchTab('inventory')" id="tab-btn-inventory" class="nav-tab px-3.5 py-2 text-xs font-bold rounded-lg transition-all text-slate-900 bg-white shadow-sm flex items-center gap-1.5">
+          <i data-lucide="package" class="w-4 h-4"></i> Catalog & Stock
+        </button>
+        <button onclick="switchTab('orders')" id="tab-btn-orders" class="nav-tab px-3.5 py-2 text-xs font-bold rounded-lg transition-all text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
+          <i data-lucide="shopping-bag" class="w-4 h-4"></i> Orders Logger
+        </button>
+        <button onclick="switchTab('instagram')" id="tab-btn-instagram" class="nav-tab px-3.5 py-2 text-xs font-bold rounded-lg transition-all text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
+          <i data-lucide="instagram" class="w-4 h-4 text-pink-500"></i> Instagram
+        </button>
+        <button onclick="switchTab('movements')" id="tab-btn-movements" class="nav-tab px-3.5 py-2 text-xs font-bold rounded-lg transition-all text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
+          <i data-lucide="history" class="w-4 h-4"></i> Stock Activity
+        </button>
+        <button onclick="switchTab('customize')" id="tab-btn-customize" class="nav-tab px-3.5 py-2 text-xs font-bold rounded-lg transition-all text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
+          <i data-lucide="palette" class="w-4 h-4"></i> Customize
+        </button>
+      </nav>
+
+      <!-- Global Actions -->
+      <div class="flex items-center gap-2">
+        <button onclick="openStockModal()" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors shadow-sm">
+          <i data-lucide="arrow-left-right" class="w-4 h-4 text-slate-500"></i>
+          Adjust Stock
+        </button>
+        <button onclick="openProductModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white theme-accent-bg rounded-lg shadow-sm transition-colors">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span>New Product</span>
+        </button>
+        <!-- Single Branded Lock Screen Button -->
+        <button onclick="lockApp()" title="Lock Screen" class="p-2 border border-slate-200 text-slate-600 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors ml-1">
+          <i data-lucide="lock" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Tab Bar -->
+    <div class="md:hidden flex border-t border-slate-200 bg-slate-50/75 p-1 px-3 gap-1 overflow-x-auto">
+      <button onclick="switchTab('inventory')" id="tab-m-btn-inventory" class="flex-1 py-1.5 text-xs font-semibold text-center rounded-md bg-white shadow-sm text-slate-900 whitespace-nowrap">Catalog</button>
+      <button onclick="switchTab('orders')" id="tab-m-btn-orders" class="flex-1 py-1.5 text-xs font-semibold text-center rounded-md text-slate-600 whitespace-nowrap">Orders</button>
+      <button onclick="switchTab('instagram')" id="tab-m-btn-instagram" class="flex-1 py-1.5 text-xs font-semibold text-center rounded-md text-pink-600 whitespace-nowrap">Instagram</button>
+      <button onclick="switchTab('movements')" id="tab-m-btn-movements" class="flex-1 py-1.5 text-xs font-semibold text-center rounded-md text-slate-600 whitespace-nowrap">Activity</button>
+      <button onclick="switchTab('customize')" id="tab-m-btn-customize" class="flex-1 py-1.5 text-xs font-semibold text-center rounded-md text-slate-600 whitespace-nowrap">Settings</button>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+    <!-- KPI / Metrics Grid -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+      <!-- Total SKUs -->
+      <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-semibold tracking-wide uppercase text-slate-500">Products (SKUs)</span>
+          <div class="p-2 bg-slate-100 rounded-lg text-slate-700">
+            <i data-lucide="layers" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="metric-total-skus" class="text-2xl sm:text-3xl font-extrabold text-slate-900">0</span>
+          <span class="text-xs text-slate-400 font-medium">catalog items</span>
+        </div>
+      </div>
+
+      <!-- Total Units in Stock -->
+      <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-semibold tracking-wide uppercase text-slate-500">Units on Hand</span>
+          <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+            <i data-lucide="archive" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="metric-total-units" class="text-2xl sm:text-3xl font-extrabold text-slate-900">0</span>
+          <span class="text-xs text-slate-400 font-medium">physical units</span>
+        </div>
+      </div>
+
+      <!-- Total Value (Cost & Retail) -->
+      <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-semibold tracking-wide uppercase text-slate-500">Inventory Valuation</span>
+          <div class="p-2 theme-accent-light-bg theme-accent-text rounded-lg">
+            <i data-lucide="badge-dollar-sign" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div>
+          <div class="text-2xl sm:text-3xl font-extrabold text-slate-900" id="metric-cost-value">0.00</div>
+          <div class="text-xs text-slate-500 font-medium mt-0.5">
+            Retail potential: <span id="metric-retail-value" class="font-semibold theme-accent-text">0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Low Stock Warning -->
+      <div id="low-stock-card" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between cursor-pointer hover:border-amber-300 transition-colors" onclick="applyQuickFilter('low')">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-semibold tracking-wide uppercase text-amber-700">Low Stock Attention</span>
+          <div class="p-2 bg-amber-50 text-amber-600 rounded-lg">
+            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="metric-low-stock" class="text-2xl sm:text-3xl font-extrabold text-amber-600">0</span>
+          <span id="metric-out-stock-label" class="text-xs font-medium text-slate-400">(0 out of stock)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 1: INVENTORY CATALOG -->
+    <div id="view-inventory" class="tab-view space-y-4">
+      <!-- Toolbar -->
+      <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+        <!-- Search bar -->
+        <div class="relative flex-1">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input 
+            type="text" 
+            id="search-input" 
+            oninput="renderInventoryTable()"
+            placeholder="Search by title, SKU, or tag..." 
+            class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 focus:bg-white transition-all"
+          >
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- Status pill selector -->
+          <div class="flex bg-slate-100 p-0.5 rounded-xl text-xs font-semibold text-slate-600">
+            <button onclick="setFilterStatus('all')" id="filter-status-all" class="filter-pill px-3 py-1.5 rounded-lg bg-white shadow-sm text-slate-900">All</button>
+            <button onclick="setFilterStatus('low')" id="filter-status-low" class="filter-pill px-3 py-1.5 rounded-lg hover:text-slate-900">Low Stock</button>
+            <button onclick="setFilterStatus('out')" id="filter-status-out" class="filter-pill px-3 py-1.5 rounded-lg hover:text-slate-900">Out of Stock</button>
+          </div>
+
+          <!-- Category filter -->
+          <select id="category-filter" onchange="renderInventoryTable()" class="text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl py-2 px-3 focus:outline-none focus:ring-2 focus:ring-slate-400">
+            <option value="">All Categories</option>
+          </select>
+
+          <!-- Export CSV -->
+          <button onclick="exportInventoryCSV()" title="Export current inventory list to CSV" class="p-2 border border-slate-200 bg-white hover:bg-slate-50 rounded-xl text-slate-600 hover:text-slate-900 transition-colors">
+            <i data-lucide="download" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Inventory Table Container -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider font-semibold">
+                <th class="py-3 px-4">Item & SKU</th>
+                <th class="py-3 px-4 hidden md:table-cell">Category</th>
+                <th class="py-3 px-4 text-right">Cost Price</th>
+                <th class="py-3 px-4 text-right">Selling Price</th>
+                <th class="py-3 px-4 text-right hidden sm:table-cell">Est. Margin</th>
+                <th class="py-3 px-4 text-center">Stock Level</th>
+                <th class="py-3 px-4 text-center">Status</th>
+                <th class="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-tbody" class="divide-y divide-slate-100 text-slate-700">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+        <div id="empty-inventory-state" class="hidden p-12 text-center">
+          <div class="w-12 h-12 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3">
+            <i data-lucide="box" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-sm font-bold text-slate-800">No inventory matches found</h3>
+          <p class="text-xs text-slate-500 max-w-xs mx-auto mt-1">Try tweaking your search keywords or clear your active filters.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: MANUAL ORDER LOGGER -->
+    <div id="view-orders" class="tab-view space-y-4 hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- New Order Form -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-sm font-bold text-slate-900">Create Manual Order</h2>
+              <p class="text-xs text-slate-500">Log DM, WhatsApp, or exhibition sales with fulfillment</p>
+            </div>
+            <span class="p-1.5 theme-accent-light-bg theme-accent-text rounded-lg">
+              <i data-lucide="receipt" class="w-4 h-4"></i>
+            </span>
+          </div>
+
+          <form id="order-form" onsubmit="handleCreateOrder(event)" class="space-y-3.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Customer Name / Handle *</label>
+                <input type="text" id="order-customer" required placeholder="Priya Sharma (@priya_k)" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Phone / WhatsApp</label>
+                <input type="tel" id="order-phone" placeholder="+91 98765 43210" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Shipping / Delivery Address</label>
+              <textarea id="order-address" rows="2" placeholder="Full postal address, city, pincode..." class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400"></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Channel Source</label>
+                <select id="order-channel" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+                  <option value="Instagram DM">Instagram DM</option>
+                  <option value="WhatsApp">WhatsApp</option>
+                  <option value="Pop-up / Exhibition">Pop-up / Exhibition</option>
+                  <option value="Friends & Family">Friends & Family</option>
+                  <option value="Direct Website">Direct Website</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Select Item *</label>
+                <select id="order-product-select" onchange="updateOrderPricePreview()" required class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+                  <!-- Dynamically populated -->
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Quantity *</label>
+                <input type="number" id="order-qty" min="1" value="1" oninput="updateOrderPricePreview()" required class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Total (<span class="currency-symbol">₹</span>) *</label>
+                <input type="number" step="0.01" id="order-total" required class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Payment Status</label>
+                <select id="order-payment-status" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+                  <option value="Paid (UPI / GPay)">Paid (UPI / GPay)</option>
+                  <option value="Paid (Bank Transfer)">Paid (Bank Transfer)</option>
+                  <option value="Paid (Cash)">Paid (Cash)</option>
+                  <option value="Pending Payment">Pending Payment</option>
+                  <option value="COD (Cash on Delivery)">COD (Cash on Delivery)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Fulfillment Status</label>
+                <select id="order-fulfillment-status" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+                  <option value="Processing">Processing</option>
+                  <option value="Packed">Packed</option>
+                  <option value="Shipped">Shipped / In Transit</option>
+                  <option value="Out for Delivery">Out for Delivery</option>
+                  <option value="Delivered">Delivered</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Courier Partner</label>
+                <input type="text" id="order-courier" placeholder="e.g. Delhivery, India Post, DTDC" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Tracking Number / AWB</label>
+                <input type="text" id="order-tracking" placeholder="e.g. DEL123456789" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 font-mono">
+              </div>
+            </div>
+
+            <button type="submit" class="w-full mt-2 py-2.5 px-4 theme-accent-bg hover:opacity-95 text-white text-xs font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2">
+              <i data-lucide="check" class="w-4 h-4"></i> Record Order & Deduct Stock
+            </button>
+          </form>
+        </div>
+
+        <!-- Orders History Table -->
+        <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between overflow-hidden">
+          <div>
+            <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 class="text-sm font-bold text-slate-900">Orders & Fulfillment Pipeline</h2>
+                <p id="orders-count-label" class="text-xs text-slate-500">0 total orders logged</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <select id="order-filter-status" onchange="renderOrdersTable()" class="text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl py-1.5 px-2.5">
+                  <option value="all">All Orders</option>
+                  <option value="active">Active (Pending / In Transit)</option>
+                  <option value="Delivered">Delivered</option>
+                  <option value="unpaid">Unpaid / Pending Payment</option>
+                </select>
+                <button onclick="exportOrdersCSV()" title="Export Orders CSV" class="p-2 border border-slate-200 hover:bg-slate-50 rounded-xl text-slate-600 transition-colors">
+                  <i data-lucide="download" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider font-semibold">
+                    <th class="py-3 px-4">Order ID & Date</th>
+                    <th class="py-3 px-4">Customer & Address</th>
+                    <th class="py-3 px-4">Item & Qty</th>
+                    <th class="py-3 px-4 text-right">Amount</th>
+                    <th class="py-3 px-4">Payment</th>
+                    <th class="py-3 px-4">Courier & Status</th>
+                    <th class="py-3 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-tbody" class="divide-y divide-slate-100 text-slate-700">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+
+            <div id="empty-orders-state" class="hidden p-12 text-center text-xs text-slate-500">
+              No matching orders found.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2.5: INSTAGRAM DIRECT HUB -->
+    <div id="view-instagram" class="tab-view space-y-4 hidden">
+      <div class="max-w-4xl mx-auto space-y-6">
+        <!-- Hero Card -->
+        <div class="bg-gradient-to-tr from-amber-50 via-rose-50 to-purple-50 border border-rose-100 rounded-3xl p-6 sm:p-8 shadow-sm relative overflow-hidden">
+          <div class="absolute -right-6 -bottom-6 w-44 h-44 bg-gradient-to-tr from-pink-500/10 to-rose-400/20 rounded-full blur-2xl pointer-events-none"></div>
+
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative z-10">
+            <div class="flex items-center gap-4">
+              <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 p-0.5 shadow-md flex items-center justify-center shrink-0">
+                <div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
+                  <i data-lucide="instagram" class="w-8 h-8 text-rose-600"></i>
+                </div>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h2 id="ig-display-handle" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">@byeoltara</h2>
+                  <span id="ig-active-label" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-100 text-rose-800">
+                    <i data-lucide="sparkles" class="w-3 h-3"></i> Main Shop
+                  </span>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-600 mt-1">Direct bridge for your Instagram DM orders, story drops, and catalog sharing.</p>
+              </div>
+            </div>
+
+            <!-- Direct Launch Button -->
+            <a id="ig-direct-link" href="https://instagram.com/byeoltara" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-rose-600 via-pink-600 to-purple-600 text-white font-bold text-xs sm:text-sm shadow-md hover:opacity-95 hover:shadow-lg transition-all">
+              <span>Open Instagram Page</span>
+              <i data-lucide="external-link" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Multi-Account Switcher & Selector -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">Your Connected Instagram Accounts</h3>
+              <p class="text-xs text-slate-500">Switch or quick-launch any of your sub-brands and niche handles</p>
+            </div>
+            <button onclick="switchTab('customize')" class="text-xs font-semibold theme-accent-text hover:underline flex items-center gap-1">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Manage Accounts
+            </button>
+          </div>
+          <div id="ig-accounts-hub-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Quick DM Order Workflow -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="p-2.5 rounded-xl bg-pink-50 text-pink-600 w-fit mb-3">
+                <i data-lucide="message-circle" class="w-5 h-5"></i>
+              </div>
+              <h3 class="text-sm font-bold text-slate-900">Log DM Sale</h3>
+              <p class="text-xs text-slate-500 mt-1">Closed an order on Instagram chat? Deduct stock in one click.</p>
+            </div>
+            <button onclick="quickLogFromInstagram()" class="mt-4 w-full py-2 px-3 text-xs font-bold rounded-xl theme-accent-bg text-white transition-colors shadow-sm flex items-center justify-center gap-1.5">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Open Order Logger
+            </button>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="p-2.5 rounded-xl bg-purple-50 text-purple-600 w-fit mb-3">
+                <i data-lucide="share-2" class="w-5 h-5"></i>
+              </div>
+              <h3 class="text-sm font-bold text-slate-900">Share Profile Link</h3>
+              <p class="text-xs text-slate-500 mt-1">Copy active Instagram shop link to send to buyers on WhatsApp.</p>
+            </div>
+            <button onclick="copyInstagramLink()" class="mt-4 w-full py-2 px-3 text-xs font-bold rounded-xl bg-slate-900 hover:bg-slate-800 text-white transition-colors shadow-sm flex items-center justify-center gap-1.5">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Profile Link
+            </button>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="p-2.5 rounded-xl bg-amber-50 text-amber-600 w-fit mb-3">
+                <i data-lucide="settings" class="w-5 h-5"></i>
+              </div>
+              <h3 class="text-sm font-bold text-slate-900">Add / Edit Accounts</h3>
+              <p class="text-xs text-slate-500 mt-1">Configure and manage all brand accounts in store settings.</p>
+            </div>
+            <button onclick="switchTab('customize')" class="mt-4 w-full py-2 px-3 text-xs font-bold rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 transition-colors flex items-center justify-center gap-1.5">
+              <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Edit in Settings
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: STOCK AUDIT / MOVEMENT LOG -->
+    <div id="view-movements" class="tab-view space-y-4 hidden">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm">
+        <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-sm font-bold text-slate-900">Stock Movement Audit Log</h2>
+            <p class="text-xs text-slate-500">Transparent record of restocks, sales, returns, and damages</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="openStockModal()" class="px-3 py-1.5 text-xs font-semibold theme-accent-bg text-white rounded-lg transition-colors flex items-center gap-1.5">
+              <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Manual Stock Entry
+            </button>
+            <button onclick="clearMovementsLog()" class="px-3 py-1.5 text-xs font-semibold text-rose-600 border border-rose-200 hover:bg-rose-50 rounded-lg transition-colors">
+              Clear Log
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider font-semibold">
+                <th class="py-3 px-4">Timestamp</th>
+                <th class="py-3 px-4">Product / SKU</th>
+                <th class="py-3 px-4">Type</th>
+                <th class="py-3 px-4 text-center">Qty Change</th>
+                <th class="py-3 px-4 text-center">Balance Result</th>
+                <th class="py-3 px-4">Notes / Reason</th>
+              </tr>
+            </thead>
+            <tbody id="movements-tbody" class="divide-y divide-slate-100 text-slate-700">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+        <div id="empty-movements-state" class="hidden p-12 text-center text-xs text-slate-500">
+          No inventory movements logged yet.
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: IN-APP CUSTOMIZATION & SETTINGS PANEL -->
+    <div id="view-customize" class="tab-view space-y-6 hidden">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Branding & Store Profile -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+            <div class="p-2 theme-accent-light-bg theme-accent-text rounded-lg">
+              <i data-lucide="store" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h2 class="text-sm font-bold text-slate-900">Store Branding</h2>
+              <p class="text-xs text-slate-500">Customize your app title and displayed header</p>
+            </div>
+          </div>
+
+          <form onsubmit="handleSaveBranding(event)" class="space-y-3.5">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Business Name</label>
+              <input type="text" id="setting-business-name" required class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Tagline / Subheading</label>
+              <input type="text" id="setting-tagline" placeholder="e.g. Handmade Studio & Roastery" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+            </div>
+
+            <!-- Custom Logo Configuration -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Custom Brand Logo (Image)</label>
+              <div class="flex items-center gap-2">
+                <input type="url" id="setting-logo-url" placeholder="Paste image URL (e.g. https://.../logo.png)" class="flex-1 text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+                <label class="px-3 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl cursor-pointer transition-colors border border-slate-200 flex items-center gap-1 shrink-0" title="Upload image from computer">
+                  <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                  <span>Upload</span>
+                  <input type="file" id="setting-logo-file" accept="image/*" onchange="handleLogoFileUpload(event)" class="hidden">
+                </label>
+                <button type="button" onclick="clearLogo()" title="Reset to default icon" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl border border-slate-200 transition-colors">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1">Upload a square photo from your device or paste an image link.</p>
+            </div>
+
+            <!-- Primary Instagram Handle -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Primary Instagram Handle / URL</label>
+              <div class="relative">
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-mono">@</span>
+                <input type="text" id="setting-instagram" placeholder="byeoltara" class="w-full text-xs sm:text-sm pl-8 pr-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 font-medium">
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1">Default main handle (e.g. <code>byeoltara</code>).</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Currency Symbol</label>
+                <select id="setting-currency" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+                  <option value="$">$ (USD)</option>
+                  <option value="₹">₹ (INR)</option>
+                  <option value="€">€ (EUR)</option>
+                  <option value="£">£ (GBP)</option>
+                  <option value="C$">C$ (CAD)</option>
+                  <option value="A$">A$ (AUD)</option>
+                  <option value="¥">¥ (JPY/CNY)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Accent Theme Color</label>
+                <select id="setting-theme-color" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+                  <option value="emerald">Emerald Green</option>
+                  <option value="indigo">Indigo Blue</option>
+                  <option value="violet">Royal Violet</option>
+                  <option value="rose">Rose Red</option>
+                  <option value="amber">Warm Amber</option>
+                  <option value="slate">Minimal Charcoal</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-colors shadow-sm">
+              Save Branding & Theme
+            </button>
+          </form>
+        </div>
+
+        <!-- Security & Passcode Manager (Password Only) -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+            <div class="p-2 bg-amber-50 text-amber-700 rounded-lg">
+              <i data-lucide="shield-check" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h2 class="text-sm font-bold text-slate-900">Security & Access Passcode</h2>
+              <p class="text-xs text-slate-500">Update your access passcode. Protected with SHA-256 encryption.</p>
+            </div>
+          </div>
+
+          <form onsubmit="handleUpdatePasscode(event)" class="space-y-3.5">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Verify Current Passcode *</label>
+              <input type="password" id="current-passcode-input" required placeholder="Enter current passcode..." autocomplete="current-password" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 font-mono">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">New Passcode / Password *</label>
+              <input type="password" id="new-passcode-input" required placeholder="Enter new passcode..." autocomplete="new-password" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 font-mono">
+              <p class="text-[11px] text-slate-400 mt-1">Can be numbers, words, or special characters.</p>
+            </div>
+
+            <div class="flex items-center gap-2 pt-1">
+              <button type="submit" class="flex-1 py-2.5 px-4 theme-accent-bg hover:opacity-95 text-white text-xs font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5">
+                <i data-lucide="key-round" class="w-4 h-4"></i>
+                <span>Update Passcode</span>
+              </button>
+
+              <button type="button" onclick="lockApp()" class="py-2.5 px-3.5 border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl transition-colors flex items-center justify-center gap-1.5" title="Lock screen immediately">
+                <i data-lucide="lock" class="w-4 h-4"></i>
+                <span>Lock</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Multi-Instagram Pages Management -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 md:col-span-2">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-2.5">
+              <div class="p-2 bg-pink-50 text-pink-600 rounded-lg">
+                <i data-lucide="instagram" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h2 class="text-sm font-bold text-slate-900">Manage Multiple Instagram Pages</h2>
+                <p class="text-xs text-slate-500">Configure secondary handles for niche collections, aesthetic drops, or pop-up stores</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add new Instagram handle form -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div>
+              <input type="text" id="new-ig-handle" placeholder="Handle (e.g. byeoltara.silver)" class="w-full text-xs px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+            </div>
+            <div>
+              <input type="text" id="new-ig-label" placeholder="Label / Sub-brand (e.g. Silver Drops)" class="w-full text-xs px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+            </div>
+            <button onclick="handleAddInstagramPage()" class="px-4 py-2 text-xs font-bold bg-gradient-to-r from-rose-600 to-pink-600 text-white rounded-xl shadow-sm hover:opacity-95 transition-opacity">
+              + Add Instagram Account
+            </button>
+          </div>
+
+          <!-- List of accounts -->
+          <div id="ig-accounts-settings-list" class="space-y-2 pt-2">
+            <!-- Dynamic items rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Custom Category Management -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 flex flex-col md:col-span-2">
+          <div class="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+            <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+              <i data-lucide="tag" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h2 class="text-sm font-bold text-slate-900">Product Categories</h2>
+              <p class="text-xs text-slate-500">Configure catalog categories for rapid filtering</p>
+            </div>
+          </div>
+
+          <!-- Add new category form -->
+          <div class="flex gap-2">
+            <input type="text" id="new-category-input" placeholder="New category name..." class="flex-1 text-xs px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+            <button onclick="handleAddCategory()" class="px-4 py-2 text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white rounded-xl transition-colors">
+              Add
+            </button>
+          </div>
+
+          <!-- Active Categories List -->
+          <div class="flex-1 space-y-1.5 overflow-y-auto max-h-48 pt-2" id="categories-management-list">
+            <!-- Dynamic tags -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Backup, Import, & Portability -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+          <div class="p-2 bg-purple-50 text-purple-600 rounded-lg">
+            <i data-lucide="database" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h2 class="text-sm font-bold text-slate-900">Data Backup & Device Portability</h2>
+            <p class="text-xs text-slate-500">Export your catalog to move between laptops or phones</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+          <button onclick="downloadJsonBackup()" class="p-3 border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 rounded-xl text-left flex items-start gap-3 transition-colors">
+            <i data-lucide="download-cloud" class="w-5 h-5 theme-accent-text mt-0.5"></i>
+            <div>
+              <div class="text-xs font-bold text-slate-900">Export Backup</div>
+              <div class="text-[11px] text-slate-500">Download .JSON archive</div>
+            </div>
+          </button>
+
+          <label class="p-3 border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 rounded-xl text-left flex items-start gap-3 transition-colors cursor-pointer">
+            <i data-lucide="upload-cloud" class="w-5 h-5 text-blue-600 mt-0.5"></i>
+            <div>
+              <div class="text-xs font-bold text-slate-900">Restore Backup</div>
+              <div class="text-[11px] text-slate-500">Upload existing .JSON file</div>
+            </div>
+            <input type="file" id="restore-settings-input" accept=".json" onchange="restoreJsonBackup(event)" class="hidden">
+          </label>
+
+          <button onclick="loadSampleDataset()" class="p-3 border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 rounded-xl text-left flex items-start gap-3 transition-colors">
+            <i data-lucide="sparkles" class="w-5 h-5 text-amber-500 mt-0.5"></i>
+            <div>
+              <div class="text-xs font-bold text-slate-900">Load Demo Data</div>
+              <div class="text-[11px] text-slate-500">Populate starter examples</div>
+            </div>
+          </button>
+
+          <button onclick="clearAllData()" class="p-3 border border-rose-200 bg-rose-50/50 hover:bg-rose-50 rounded-xl text-left flex items-start gap-3 transition-colors">
+            <i data-lucide="trash-2" class="w-5 h-5 text-rose-600 mt-0.5"></i>
+            <div>
+              <div class="text-xs font-bold text-rose-900">Wipe All Data</div>
+              <div class="text-[11px] text-rose-600">Factory reset storage</div>
+            </div>
+          </button>
+        </div>
+      </div>
+  <!-- MODAL: ORDER DETAILS & FULFILLMENT UPDATE -->
+  <div id="order-update-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="modal-backdrop fixed inset-0" onclick="closeOrderUpdateModal()"></div>
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 relative z-10 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div>
+          <h3 class="text-base font-bold text-slate-900" id="modal-order-title">Update Order</h3>
+          <p class="text-xs text-slate-500" id="modal-order-subtitle">Edit tracking, shipping address, or payment</p>
+        </div>
+        <button onclick="closeOrderUpdateModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="order-update-form" onsubmit="handleSaveOrderUpdate(event)" class="space-y-4 pt-4">
+        <input type="hidden" id="edit-order-id">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Payment Status</label>
+            <select id="edit-order-payment" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+              <option value="Paid (UPI / GPay)">Paid (UPI / GPay)</option>
+              <option value="Paid (Bank Transfer)">Paid (Bank Transfer)</option>
+              <option value="Paid (Cash)">Paid (Cash)</option>
+              <option value="Pending Payment">Pending Payment</option>
+              <option value="COD (Cash on Delivery)">COD (Cash on Delivery)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Delivery / Fulfillment</label>
+            <select id="edit-order-fulfillment" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+              <option value="Processing">Processing</option>
+              <option value="Packed">Packed</option>
+              <option value="Shipped">Shipped / In Transit</option>
+              <option value="Out for Delivery">Out for Delivery</option>
+              <option value="Delivered">Delivered</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Courier Partner</label>
+            <input type="text" id="edit-order-courier" placeholder="Delhivery, DTDC, etc." class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tracking ID / AWB</label>
+            <input type="text" id="edit-order-tracking" placeholder="AWB number..." class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 font-mono">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Customer Address</label>
+          <textarea id="edit-order-address" rows="2" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Phone / WhatsApp</label>
+          <input type="tel" id="edit-order-phone" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeOrderUpdateModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">Cancel</button>
+          <button type="submit" class="px-5 py-2 text-xs font-bold theme-accent-bg text-white rounded-xl shadow-sm transition-colors">Save Updates</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: STOCK ADJUSTMENT (IN / OUT) -->
+  <div id="stock-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="modal-backdrop fixed inset-0" onclick="closeStockModal()"></div>
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 relative z-10 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <h3 class="text-base font-bold text-slate-900">Adjust Stock Level</h3>
+        <button onclick="closeStockModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="stock-form" onsubmit="handleStockAdjustment(event)" class="space-y-4 pt-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Select Product *</label>
+          <select id="adj-product-id" required class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+            <!-- Dynamic list of items -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Adjustment Type *</label>
+          <select id="adj-type" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+            <option value="Restock (+) items">Restock / Sourced batch (+)</option>
+            <option value="Sale (-)">Direct Sale (-)</option>
+            <option value="Damaged / Loss (-)">Damaged / Defective (-)</option>
+            <option value="Customer Return (+)">Customer Return (+)</option>
+            <option value="Manual Count Correction">Manual Count Override</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Quantity Units *</label>
+          <input type="number" id="adj-qty" required min="1" value="1" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+          <p class="text-[11px] text-slate-400 mt-1">If "Manual Count Override", enter the exact new count.</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Reason / Reference Note</label>
+          <input type="text" id="adj-notes" placeholder="e.g. Sourced 10 units from local supplier" class="w-full text-xs sm:text-sm px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400">
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeStockModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">Cancel</button>
+          <button type="submit" class="px-5 py-2 text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white rounded-xl shadow-sm transition-colors">Apply Stock Change</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC -->
+  <script>
+    // --- 1. DEFAULT DATASETS ---
+    const THEME_PALETTES = {
+      gold:    { primary: '#b47a16', hover: '#925f0e', light: '#fef7ea', ring: 'rgba(180, 122, 22, 0.25)' },
+      rose:    { primary: '#e11d48', hover: '#be123c', light: '#fff1f2', ring: 'rgba(225, 29, 72, 0.25)' },
+      emerald: { primary: '#16a34a', hover: '#15803d', light: '#f0fdf4', ring: 'rgba(22, 163, 74, 0.25)' },
+      indigo:  { primary: '#4f46e5', hover: '#4338ca', light: '#eef2ff', ring: 'rgba(79, 70, 229, 0.25)' },
+      violet:  { primary: '#7c3aed', hover: '#6d28d9', light: '#f5f3ff', ring: 'rgba(124, 58, 237, 0.25)' },
+      amber:   { primary: '#d97706', hover: '#b45309', light: '#fffbeb', ring: 'rgba(217, 119, 6, 0.25)' },
+      slate:   { primary: '#334155', hover: '#1e293b', light: '#f8fafc', ring: 'rgba(51, 65, 85, 0.25)' }
+    };
+
+    const DEFAULT_CONFIG = {
+      businessName: "Byeol Tara",
+      tagline: "Korean Dainty & Indian Boho Silver Jewelry",
+      instagramHandle: "byeoltara",
+      instagramAccounts: [
+        { handle: "byeoltara", label: "Main Shop", isPrimary: true },
+        { handle: "byeoltara.silver", label: "Boho & Oxidized Silver", isPrimary: false }
+      ],
+      logoUrl: "",
+      // SHA-256 for default passcode "1234"
+      passcodeHash: "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",
+      currency: "₹",
+      themeColor: "gold",
+      categories: [
+        "Dainty Earrings",
+        "Boho Oxidized Silver",
+        "Necklaces & Pendants",
+        "Bracelets & Bangles",
+        "Rings & Toe Rings",
+        "Hair Accessories & Pins",
+        "Packaging & Pouches"
+      ]
+    };
+
+    const DEFAULT_PRODUCTS = [
+      {
+        id: "prod-1",
+        name: "Dainty Korean Zircon Huggies (Silver 925)",
+        sku: "BT-ER-K01",
+        category: "Dainty Earrings",
+        cost: 240,
+        price: 699,
+        stock: 18,
+        threshold: 5,
+        image: "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=120&q=80"
+      },
+      {
+        id: "prod-2",
+        name: "Vintage Floral Oxidized Jhumkas",
+        sku: "BT-OX-J04",
+        category: "Boho Oxidized Silver",
+        cost: 320,
+        price: 849,
+        stock: 4,
+        threshold: 6,
+        image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=120&q=80"
+      },
+      {
+        id: "prod-3",
+        name: "Celeste Star & Crescent Moon Layered Pendant",
+        sku: "BT-NK-MOON",
+        category: "Necklaces & Pendants",
+        cost: 290,
+        price: 799,
+        stock: 12,
+        threshold: 5,
+        image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=120&q=80"
+      },
+      {
+        id: "prod-4",
+        name: "Handcrafted Tribal Mirror Bangle Pair",
+        sku: "BT-BR-TRI02",
+        category: "Bracelets & Bangles",
+        cost: 410,
+        price: 1099,
+        stock: 2,
+        threshold: 4,
+        image: "https://images.unsplash.com/photo-1611591475870-74960350329a?auto=format&fit=crop&w=120&q=80"
+      },
+      {
+        id: "prod-5",
+        name: "Minimalist Freshwater Pearl Dainty Chain",
+        sku: "BT-BR-PRL01",
+        category: "Bracelets & Bangles",
+        cost: 180,
+        price: 549,
+        stock: 0,
+        threshold: 5,
+        image: "https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?auto=format&fit=crop&w=120&q=80"
+      },
+      {
+        id: "prod-6",
+        name: "Velvet Ribbon Drawstring Gift Pouches (Pack of 10)",
+        sku: "BT-PKG-VLV",
+        category: "Packaging & Pouches",
+        cost: 95,
+        price: 249,
+        stock: 25,
+        threshold: 8,
+        image: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=120&q=80"
+      }
+    ];
+
+    const DEFAULT_MOVEMENTS = [
+      {
+        id: "mov-1",
+        timestamp: new Date(Date.now() - 86400000 * 3).toISOString(),
+        productName: "Dainty Korean Zircon Huggies (Silver 925)",
+        sku: "BT-ER-K01",
+        type: "Restock (+) items",
+        delta: 20,
+        newStock: 20,
+        notes: "Artisan batch arrival"
+      },
+      {
+        id: "mov-2",
+        timestamp: new Date(Date.now() - 86400000 * 1).toISOString(),
+        productName: "Dainty Korean Zircon Huggies (Silver 925)",
+        sku: "BT-ER-K01",
+        type: "Sale (-)",
+        delta: -2,
+        newStock: 18,
+        notes: "Instagram DM order"
+      }
+    ];
+
+    const DEFAULT_ORDERS = [
+      {
+        id: "BT-1021",
+        date: new Date(Date.now() - 86400000 * 1).toISOString(),
+        customer: "Ananya Sharma (@ananya_s)",
+        phone: "+91 98450 12345",
+        address: "Flat 402, Lotus Orchid, Indiranagar, Bangalore - 560038",
+        channel: "Instagram DM",
+        productName: "Dainty Korean Zircon Huggies (Silver 925)",
+        sku: "BT-ER-K01",
+        quantity: 2,
+        total: 1398,
+        paymentStatus: "Paid (UPI / GPay)",
+        fulfillmentStatus: "Shipped",
+        courier: "Delhivery Surface",
+        trackingNumber: "DEL9928172635"
+      }
+    ];
+
+    // --- 2. STATE PERSISTENCE ---
+    let config = JSON.parse(localStorage.getItem('solostock_config')) || DEFAULT_CONFIG;
+    let products = JSON.parse(localStorage.getItem('solostock_products')) || DEFAULT_PRODUCTS;
+    let movements = JSON.parse(localStorage.getItem('solostock_movements')) || DEFAULT_MOVEMENTS;
+    let orders = JSON.parse(localStorage.getItem('solostock_orders')) || DEFAULT_ORDERS;
+    let activeFilterStatus = 'all';
+    let isAuthenticated = sessionStorage.getItem('solostock_authenticated') === 'true';
+
+    // Helper: Cryptographic SHA-256 hash function using Web Crypto API
+    async function sha256(message) {
+      const msgBuffer = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Migration / Ensure multi-account list exists
+    if (!config.instagramAccounts || !Array.isArray(config.instagramAccounts)) {
+      config.instagramAccounts = [
+        { handle: config.instagramHandle || "byeoltara", label: "Main Shop", isPrimary: true }
+      ];
+    }
+
+    // Migration: If existing config stored plain text 'passcode', hash and replace it
+    if (config.passcode) {
+      sha256(String(config.passcode)).then(hash => {
+        config.passcodeHash = hash;
+        delete config.passcode;
+        localStorage.setItem('solostock_config', JSON.stringify(config));
+      });
+    } else if (!config.passcodeHash) {
+      config.passcodeHash = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4"; // "1234"
+    }
+
+    // Force default to Gold palette if previously on old default
+    if (!config.themeColor || config.themeColor === 'rose') {
+      config.themeColor = 'gold';
+    }
+
+    function checkAuth() {
+      const lock = document.getElementById('auth-lockscreen');
+      if (isAuthenticated) {
+        lock.classList.add('hidden');
+      } else {
+        lock.classList.remove('hidden');
+        setTimeout(() => {
+          const passInput = document.getElementById('auth-passcode-input');
+          if (passInput) passInput.focus();
+        }, 100);
+      }
+    }
+
+    async function handleAuthLogin(e) {
+      e.preventDefault();
+      const passVal = document.getElementById('auth-passcode-input').value.trim();
+      const errorMsg = document.getElementById('auth-error-msg');
+
+      const expectedPassHash = config.passcodeHash || "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
+      const inputPassHash = await sha256(passVal);
+
+      if (inputPassHash === expectedPassHash) {
+        isAuthenticated = true;
+        sessionStorage.setItem('solostock_authenticated', 'true');
+        document.getElementById('auth-lockscreen').classList.add('hidden');
+        document.getElementById('auth-passcode-input').value = "";
+        errorMsg.classList.add('hidden');
+        showToast("Welcome back, Owner!");
+      } else {
+        errorMsg.classList.remove('hidden');
+        document.getElementById('auth-passcode-input').select();
+      }
+    }
+
+    function lockApp() {
+      isAuthenticated = false;
+      sessionStorage.removeItem('solostock_authenticated');
+      checkAuth();
+      showToast("Workspace locked");
+    }
+
+    async function handleUpdatePasscode(e) {
+      e.preventDefault();
+      const currentInput = document.getElementById('current-passcode-input').value.trim();
+      const newPass = document.getElementById('new-passcode-input').value.trim();
+
+      if (!currentInput || !newPass) {
+        showToast("Please fill in both passcode fields", "error");
+        return;
+      }
+
+      const currentHash = await sha256(currentInput);
+      const expectedHash = config.passcodeHash || "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
+
+      if (currentHash !== expectedHash) {
+        showToast("Current passcode is incorrect!", "error");
+        document.getElementById('current-passcode-input').select();
+        return;
+      }
+
+      config.passcodeHash = await sha256(newPass);
+      saveData();
+
+      document.getElementById('current-passcode-input').value = '';
+      document.getElementById('new-passcode-input').value = '';
+      showToast("Passcode updated and encrypted with SHA-256!");
+    }
+
+    function saveData() {
+      localStorage.setItem('solostock_config', JSON.stringify(config));
+      localStorage.setItem('solostock_products', JSON.stringify(products));
+      localStorage.setItem('solostock_movements', JSON.stringify(movements));
+      localStorage.setItem('solostock_orders', JSON.stringify(orders));
+      applyTheme();
+      refreshUI();
+    }
+
+    function applyTheme() {
+      const palette = THEME_PALETTES[config.themeColor] || THEME_PALETTES.gold;
+      document.documentElement.style.setProperty('--primary-color', palette.primary);
+      document.documentElement.style.setProperty('--primary-hover', palette.hover);
+      document.documentElement.style.setProperty('--primary-light', palette.light);
+      document.documentElement.style.setProperty('--primary-ring', palette.ring);
+
+      // Update titles and branding
+      document.getElementById('header-business-name').innerHTML = `${config.businessName} <span class="theme-accent-text">별 तारा</span>`;
+      document.getElementById('header-tagline-badge').innerText = config.tagline || 'Korean Dainty & Indian Boho Silver';
+      document.getElementById('app-browser-title').innerText = `${config.businessName} — Jewelry Inventory & Orders`;
+
+      // Update Custom Logo
+      const logoImg = document.getElementById('header-brand-img');
+      const logoIcon = document.getElementById('header-brand-icon');
+      if (config.logoUrl && config.logoUrl.trim() !== '') {
+        logoImg.src = config.logoUrl;
+        logoImg.classList.remove('hidden');
+        logoIcon.classList.add('hidden');
+      } else {
+        logoImg.classList.add('hidden');
+        logoIcon.classList.remove('hidden');
+      }
+
+      // Update Instagram Hub elements with active primary account
+      const activeAccount = (config.instagramAccounts && config.instagramAccounts.find(a => a.isPrimary)) || 
+                            { handle: config.instagramHandle || 'byeoltara', label: 'Main Shop' };
+      const cleanHandle = activeAccount.handle.replace(/^@/, '').trim();
+      const igUrl = `https://instagram.com/${cleanHandle}`;
+      const igDisplay = document.getElementById('ig-display-handle');
+      const igLink = document.getElementById('ig-direct-link');
+      const igLabel = document.getElementById('ig-active-label');
+
+      if (igDisplay) igDisplay.innerText = `@${cleanHandle}`;
+      if (igLink) igLink.href = igUrl;
+      if (igLabel) igLabel.innerHTML = `<i data-lucide="sparkles" class="w-3 h-3"></i> ${activeAccount.label || 'Official Shop'}`;
+
+      renderInstagramHubAccounts();
+
+      // Update currency symbols across UI
+      document.querySelectorAll('.currency-symbol').forEach(el => {
+        el.innerText = config.currency;
+      });
+    }
+
+    // --- 3. TOAST NOTIFICATIONS ---
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const bgColor = type === 'success' ? 'bg-slate-900 text-white' : 'bg-rose-600 text-white';
+      const iconName = type === 'success' ? 'check-circle' : 'alert-circle';
+
+      toast.className = `pointer-events-auto px-4 py-2.5 rounded-xl shadow-lg border border-slate-700/50 flex items-center gap-2.5 text-xs font-semibold transform transition-all duration-300 translate-y-3 opacity-0 ${bgColor}`;
+      toast.innerHTML = `<i data-lucide="${iconName}" class="w-4 h-4"></i><span>${message}</span>`;
+      
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-3', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-3');
+        setTimeout(() => toast.remove(), 300);
+      }, 2600);
+    }
+
+    // --- 4. TABS NAVIGATION ---
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+
+      // Desktop buttons
+      document.querySelectorAll('.nav-tab').forEach(btn => {
+        btn.classList.remove('text-slate-900', 'bg-white', 'shadow-sm');
+        btn.classList.add('text-slate-600');
+      });
+      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+      if (activeBtn) {
+        activeBtn.classList.add('text-slate-900', 'bg-white', 'shadow-sm');
+        activeBtn.classList.remove('text-slate-600');
+      }
+
+      // Mobile buttons
+      document.querySelectorAll('[id^="tab-m-btn-"]').forEach(btn => {
+        btn.classList.remove('bg-white', 'shadow-sm', 'text-slate-900');
+        btn.classList.add('text-slate-600');
+      });
+      const activeMobileBtn = document.getElementById(`tab-m-btn-${tabId}`);
+      if (activeMobileBtn) {
+        activeMobileBtn.classList.add('bg-white', 'shadow-sm', 'text-slate-900');
+        activeMobileBtn.classList.remove('text-slate-600');
+      }
+
+      lucide.createIcons();
+    }
+
+    // --- 5. METRICS CALCULATION ---
+    function updateMetrics() {
+      const cur = config.currency || '$';
+      const totalSkus = products.length;
+      const totalUnits = products.reduce((acc, p) => acc + Number(p.stock), 0);
+      const totalCostValue = products.reduce((acc, p) => acc + (Number(p.cost) * Number(p.stock)), 0);
+      const totalRetailValue = products.reduce((acc, p) => acc + (Number(p.price) * Number(p.stock)), 0);
+      
+      const lowStockItems = products.filter(p => p.stock > 0 && p.stock <= p.threshold);
+      const outOfStockItems = products.filter(p => p.stock === 0);
+
+      document.getElementById('metric-total-skus').innerText = totalSkus;
+      document.getElementById('metric-total-units').innerText = totalUnits.toLocaleString();
+      document.getElementById('metric-cost-value').innerText = `${cur}${totalCostValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      document.getElementById('metric-retail-value').innerText = `${cur}${totalRetailValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      
+      document.getElementById('metric-low-stock').innerText = lowStockItems.length + outOfStockItems.length;
+      document.getElementById('metric-out-stock-label').innerText = `(${outOfStockItems.length} out of stock)`;
+    }
+
+    // --- 6. INVENTORY TABLE RENDERING ---
+    function setFilterStatus(status) {
+      activeFilterStatus = status;
+      document.querySelectorAll('.filter-pill').forEach(btn => {
+        btn.classList.remove('bg-white', 'shadow-sm', 'text-slate-900');
+        btn.classList.add('text-slate-600');
+      });
+      const activeBtn = document.getElementById(`filter-status-${status}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-white', 'shadow-sm', 'text-slate-900');
+      }
+      renderInventoryTable();
+    }
+
+    function applyQuickFilter(status) {
+      switchTab('inventory');
+      setFilterStatus(status);
+    }
+
+    function renderInventoryTable() {
+      const cur = config.currency || '$';
+      const search = (document.getElementById('search-input').value || '').toLowerCase().trim();
+      const selectedCategory = document.getElementById('category-filter').value;
+      const tbody = document.getElementById('inventory-tbody');
+      const emptyState = document.getElementById('empty-inventory-state');
+
+      // Populate Category Filter dropdown
+      const catSelect = document.getElementById('category-filter');
+      const currentCat = catSelect.value;
+      const allCategories = [...new Set([...config.categories, ...products.map(p => p.category).filter(Boolean)])].sort();
+      
+      catSelect.innerHTML = '<option value="">All Categories</option>' + allCategories.map(c => 
+        `<option value="${c}" ${c === currentCat ? 'selected' : ''}>${c}</option>`
+      ).join('');
+
+      // Filter rows
+      const filtered = products.filter(p => {
+        const matchesSearch = p.name.toLowerCase().includes(search) || 
+                              p.sku.toLowerCase().includes(search) ||
+                              (p.category && p.category.toLowerCase().includes(search));
+        
+        const matchesCat = !selectedCategory || p.category === selectedCategory;
+
+        let matchesStatus = true;
+        if (activeFilterStatus === 'low') {
+          matchesStatus = p.stock > 0 && p.stock <= p.threshold;
+        } else if (activeFilterStatus === 'out') {
+          matchesStatus = p.stock === 0;
+        }
+
+        return matchesSearch && matchesCat && matchesStatus;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      tbody.innerHTML = filtered.map(item => {
+        const marginPct = item.price > 0 ? (((item.price - item.cost) / item.price) * 100).toFixed(0) : 0;
+        
+        let statusBadge = '';
+        if (item.stock === 0) {
+          statusBadge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Out of Stock</span>';
+        } else if (item.stock <= item.threshold) {
+          statusBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Low Stock (≤${item.threshold})</span>`;
+        } else {
+          statusBadge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">In Stock</span>';
+        }
+
+        const thumb = item.image 
+          ? `<img src="${item.image}" alt="${item.name}" class="w-9 h-9 rounded-lg object-cover border border-slate-200 shrink-0" onerror="this.src='https://placehold.co/80x80/f1f5f9/94a3b8?text=Box'">`
+          : `<div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 shrink-0 border border-slate-200"><i data-lucide="package" class="w-4 h-4"></i></div>`;
+
+        return `
+          <tr class="hover:bg-slate-50/70 transition-colors">
+            <td class="py-3 px-4">
+              <div class="flex items-center gap-3">
+                ${thumb}
+                <div>
+                  <span class="font-bold text-slate-900 block">${item.name}</span>
+                  <span class="text-[11px] font-mono text-slate-400 block">${item.sku}</span>
+                </div>
+              </div>
+            </td>
+            <td class="py-3 px-4 hidden md:table-cell text-slate-500 font-medium">
+              ${item.category || '<span class="text-slate-300">—</span>'}
+            </td>
+            <td class="py-3 px-4 text-right font-medium text-slate-600">
+              ${cur}${Number(item.cost).toFixed(2)}
+            </td>
+            <td class="py-3 px-4 text-right font-bold text-slate-900">
+              ${cur}${Number(item.price).toFixed(2)}
+            </td>
+            <td class="py-3 px-4 text-right hidden sm:table-cell">
+              <span class="inline-block font-semibold ${marginPct >= 50 ? 'theme-accent-text' : 'text-slate-600'}">
+                ${marginPct}%
+              </span>
+            </td>
+            <td class="py-3 px-4">
+              <div class="flex items-center justify-center gap-1.5">
+                <button onclick="inlineQuickAdjust('${item.id}', -1)" title="Deduct 1" class="w-6 h-6 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-xs font-bold transition-colors">
+                  -
+                </button>
+                <span class="font-extrabold w-8 text-center text-slate-900">${item.stock}</span>
+                <button onclick="inlineQuickAdjust('${item.id}', 1)" title="Add 1" class="w-6 h-6 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-xs font-bold transition-colors">
+                  +
+                </button>
+              </div>
+            </td>
+            <td class="py-3 px-4 text-center">
+              ${statusBadge}
+            </td>
+            <td class="py-3 px-4 text-right">
+              <div class="flex items-center justify-end gap-1">
+                <button onclick="openStockModal('${item.id}')" title="Log Movement" class="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
+                  <i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="editProduct('${item.id}')" title="Edit Product" class="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
+                  <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="deleteProduct('${item.id}')" title="Delete Product" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // --- 7. INLINE STOCK ADJUSTMENT ---
+    function inlineQuickAdjust(productId, delta) {
+      const prod = products.find(p => p.id === productId);
+      if (!prod) return;
+
+      const oldStock = prod.stock;
+      const newStock = Math.max(0, oldStock + delta);
+      if (newStock === oldStock) return;
+
+      prod.stock = newStock;
+
+      movements.unshift({
+        id: "mov-" + Date.now(),
+        timestamp: new Date().toISOString(),
+        productName: prod.name,
+        sku: prod.sku,
+        type: delta > 0 ? "Quick Restock (+1)" : "Quick Deduct (-1)",
+        delta: delta,
+        newStock: newStock,
+        notes: "Quick row adjustment"
+      });
+
+      saveData();
+      showToast(`${prod.sku} stock updated to ${newStock}`);
+    }
+
+    // --- 8. PRODUCT ADD / EDIT ---
+    function openProductModal(isEdit = false) {
+      // Refresh category choices inside product modal
+      const catSelect = document.getElementById('prod-category');
+      catSelect.innerHTML = config.categories.map(c => `<option value="${c}">${c}</option>`).join('');
+
+      document.getElementById('product-modal').classList.remove('hidden');
+      if (!isEdit) {
+        document.getElementById('product-modal-title').innerText = "Add New Product";
+        document.getElementById('product-form').reset();
+        document.getElementById('prod-id').value = "";
+      }
+      lucide.createIcons();
+    }
+
+    function closeProductModal() {
+      document.getElementById('product-modal').classList.add('hidden');
+    }
+
+    function editProduct(productId) {
+      const p = products.find(i => i.id === productId);
+      if (!p) return;
+
+      openProductModal(true);
+      document.getElementById('product-modal-title').innerText = "Edit Product";
+      document.getElementById('prod-id').value = p.id;
+      document.getElementById('prod-name').value = p.name;
+      document.getElementById('prod-sku').value = p.sku;
+      document.getElementById('prod-category').value = p.category || config.categories[0] || '';
+      document.getElementById('prod-cost').value = p.cost;
+      document.getElementById('prod-price').value = p.price;
+      document.getElementById('prod-stock').value = p.stock;
+      document.getElementById('prod-threshold').value = p.threshold;
+      document.getElementById('prod-image').value = p.image || '';
+    }
+
+    function handleSaveProduct(e) {
+      e.preventDefault();
+      const id = document.getElementById('prod-id').value;
+      const name = document.getElementById('prod-name').value.trim();
+      const sku = document.getElementById('prod-sku').value.trim().toUpperCase();
+      const category = document.getElementById('prod-category').value;
+      const cost = parseFloat(document.getElementById('prod-cost').value) || 0;
+      const price = parseFloat(document.getElementById('prod-price').value) || 0;
+      const stock = parseInt(document.getElementById('prod-stock').value, 10) || 0;
+      const threshold = parseInt(document.getElementById('prod-threshold').value, 10) || 5;
+      const image = document.getElementById('prod-image').value.trim();
+
+      if (!id && products.some(p => p.sku === sku)) {
+        showToast("A product with this SKU already exists!", "error");
+        return;
+      }
+
+      if (id) {
+        const index = products.findIndex(p => p.id === id);
+        if (index !== -1) {
+          const oldStock = products[index].stock;
+          products[index] = { ...products[index], name, sku, category, cost, price, stock, threshold, image };
+          
+          if (oldStock !== stock) {
+            movements.unshift({
+              id: "mov-" + Date.now(),
+              timestamp: new Date().toISOString(),
+              productName: name,
+              sku: sku,
+              type: "Product Edit Override",
+              delta: stock - oldStock,
+              newStock: stock,
+              notes: "Updated via product edit modal"
+            });
+          }
+          showToast(`Updated "${name}"`);
+        }
+      } else {
+        const newProduct = {
+          id: "prod-" + Date.now(),
+          name,
+          sku,
+          category,
+          cost,
+          price,
+          stock,
+          threshold,
+          image
+        };
+        products.push(newProduct);
+
+        movements.unshift({
+          id: "mov-" + Date.now(),
+          timestamp: new Date().toISOString(),
+          productName: name,
+          sku: sku,
+          type: "Initial Catalog Entry",
+          delta: stock,
+          newStock: stock,
+          notes: "Initial inventory setup"
+        });
+
+        showToast(`Created "${name}"`);
+      }
+
+      saveData();
+      closeProductModal();
+    }
+
+    function deleteProduct(productId) {
+      const prod = products.find(p => p.id === productId);
+      if (!prod) return;
+
+      const confirmed = window.confirm ? confirm(`Delete product "${prod.name}" (${prod.sku})?`) : true;
+      if (!confirmed) return;
+
+      products = products.filter(p => p.id !== productId);
+      saveData();
+      showToast(`Removed "${prod.name}"`, "error");
+    }
+
+    // --- 9. STOCK ADJUSTMENTS & AUDIT ---
+    function openStockModal(preselectProductId = null) {
+      const select = document.getElementById('adj-product-id');
+      select.innerHTML = products.map(p => 
+        `<option value="${p.id}" ${p.id === preselectProductId ? 'selected' : ''}>${p.name} (${p.sku}) — In Stock: ${p.stock}</option>`
+      ).join('');
+
+      document.getElementById('stock-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeStockModal() {
+      document.getElementById('stock-modal').classList.add('hidden');
+    }
+
+    function handleStockAdjustment(e) {
+      e.preventDefault();
+      const prodId = document.getElementById('adj-product-id').value;
+      const type = document.getElementById('adj-type').value;
+      const qtyInput = parseInt(document.getElementById('adj-qty').value, 10);
+      const notes = document.getElementById('adj-notes').value.trim() || 'Manual stock update';
+
+      const prod = products.find(p => p.id === prodId);
+      if (!prod) return;
+
+      let delta = 0;
+      let newStock = prod.stock;
+
+      if (type.includes('(+)')) {
+        delta = qtyInput;
+        newStock += delta;
+      } else if (type.includes('(-)')) {
+        delta = -Math.min(prod.stock, qtyInput);
+        newStock += delta;
+      } else {
+        delta = qtyInput - prod.stock;
+        newStock = qtyInput;
+      }
+
+      prod.stock = Math.max(0, newStock);
+
+      movements.unshift({
+        id: "mov-" + Date.now(),
+        timestamp: new Date().toISOString(),
+        productName: prod.name,
+        sku: prod.sku,
+        type: type,
+        delta: delta,
+        newStock: prod.stock,
+        notes: notes
+      });
+
+      saveData();
+      closeStockModal();
+      showToast(`Stock updated for ${prod.name}`);
+    }
+
+    function renderMovementsTable() {
+      const tbody = document.getElementById('movements-tbody');
+      const empty = document.getElementById('empty-movements-state');
+
+      if (!movements.length) {
+        tbody.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      tbody.innerHTML = movements.map(m => {
+        const dateStr = new Date(m.timestamp).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
+        const isPositive = m.delta > 0;
+        const deltaFormatted = isPositive ? `+${m.delta}` : `${m.delta}`;
+        const deltaClass = isPositive ? 'text-emerald-700 bg-emerald-50' : 'text-rose-700 bg-rose-50';
+
+        return `
+          <tr class="hover:bg-slate-50/70 transition-colors">
+            <td class="py-2.5 px-4 font-mono text-[11px] text-slate-500">${dateStr}</td>
+            <td class="py-2.5 px-4 font-semibold text-slate-800">
+              ${m.productName} 
+              <span class="block text-[11px] font-mono text-slate-400 font-normal">${m.sku}</span>
+            </td>
+            <td class="py-2.5 px-4 text-slate-600 font-medium">${m.type}</td>
+            <td class="py-2.5 px-4 text-center">
+              <span class="px-2 py-0.5 rounded-md font-extrabold text-xs ${deltaClass}">
+                ${deltaFormatted}
+              </span>
+            </td>
+            <td class="py-2.5 px-4 text-center font-bold text-slate-900">${m.newStock}</td>
+            <td class="py-2.5 px-4 text-slate-500 max-w-xs truncate">${m.notes || '—'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function clearMovementsLog() {
+      if (confirm("Are you sure you want to clear the activity log?")) {
+        movements = [];
+        saveData();
+        showToast("Activity log cleared");
+      }
+    }
+
+    // --- 10. ORDERS LOGGER ---
+    function populateOrderProductDropdown() {
+      const cur = config.currency || '₹';
+      const select = document.getElementById('order-product-select');
+      select.innerHTML = products.map(p => 
+        `<option value="${p.id}" data-price="${p.price}" data-stock="${p.stock}">
+          ${p.name} (${cur}${Number(p.price).toFixed(2)}) — Avail: ${p.stock}
+        </option>`
+      ).join('');
+      updateOrderPricePreview();
+    }
+
+    function updateOrderPricePreview() {
+      const select = document.getElementById('order-product-select');
+      const selectedOption = select.options[select.selectedIndex];
+      if (!selectedOption) return;
+
+      const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+      const qty = parseInt(document.getElementById('order-qty').value, 10) || 1;
+      document.getElementById('order-total').value = (price * qty).toFixed(2);
+    }
+
+    function handleCreateOrder(e) {
+      e.preventDefault();
+      const select = document.getElementById('order-product-select');
+      const prodId = select.value;
+      const prod = products.find(p => p.id === prodId);
+
+      if (!prod) {
+        showToast("Please choose a valid product", "error");
+        return;
+      }
+
+      const qty = parseInt(document.getElementById('order-qty').value, 10) || 1;
+      if (prod.stock < qty) {
+        showToast(`Not enough stock! Available: ${prod.stock}`, "error");
+        return;
+      }
+
+      const customer = document.getElementById('order-customer').value.trim();
+      const phone = document.getElementById('order-phone').value.trim();
+      const address = document.getElementById('order-address').value.trim();
+      const channel = document.getElementById('order-channel').value.trim() || 'Direct';
+      const total = parseFloat(document.getElementById('order-total').value) || 0;
+      const paymentStatus = document.getElementById('order-payment-status').value;
+      const fulfillmentStatus = document.getElementById('order-fulfillment-status').value;
+      const courier = document.getElementById('order-courier').value.trim();
+      const trackingNumber = document.getElementById('order-tracking').value.trim();
+
+      prod.stock -= qty;
+
+      const newOrder = {
+        id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
+        date: new Date().toISOString(),
+        customer,
+        phone,
+        address,
+        channel,
+        productName: prod.name,
+        sku: prod.sku,
+        quantity: qty,
+        total,
+        paymentStatus,
+        fulfillmentStatus,
+        courier,
+        trackingNumber
+      };
+      orders.unshift(newOrder);
+
+      movements.unshift({
+        id: "mov-" + Date.now(),
+        timestamp: new Date().toISOString(),
+        productName: prod.name,
+        sku: prod.sku,
+        type: "Sale (-)",
+        delta: -qty,
+        newStock: prod.stock,
+        notes: `Order ${newOrder.id} for ${customer} (${channel})`
+      });
+
+      saveData();
+      document.getElementById('order-form').reset();
+      populateOrderProductDropdown();
+      showToast(`Order ${newOrder.id} saved & stock deducted!`);
+    }
+
+    function renderOrdersTable() {
+      const cur = config.currency || '₹';
+      const tbody = document.getElementById('orders-tbody');
+      const empty = document.getElementById('empty-orders-state');
+      const filter = document.getElementById('order-filter-status') ? document.getElementById('order-filter-status').value : 'all';
+      
+      let filtered = orders;
+      if (filter === 'active') {
+        filtered = orders.filter(o => o.fulfillmentStatus !== 'Delivered' && o.fulfillmentStatus !== 'Cancelled');
+      } else if (filter === 'Delivered') {
+        filtered = orders.filter(o => o.fulfillmentStatus === 'Delivered');
+      } else if (filter === 'unpaid') {
+        filtered = orders.filter(o => o.paymentStatus.includes('Pending') || o.paymentStatus.includes('COD'));
+      }
+
+      document.getElementById('orders-count-label').innerText = `${orders.length} total orders logged (${filtered.length} showing)`;
+
+      if (!filtered.length) {
+        tbody.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      tbody.innerHTML = filtered.map(ord => {
+        const dateStr = new Date(ord.date).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        
+        let paymentBadge = ord.paymentStatus && ord.paymentStatus.includes('Paid')
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">${ord.paymentStatus}</span>`
+          : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">${ord.paymentStatus || 'Pending'}</span>`;
+
+        let statusColor = 'bg-slate-100 text-slate-700';
+        if (ord.fulfillmentStatus === 'Delivered') statusColor = 'bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold';
+        else if (ord.fulfillmentStatus === 'Shipped') statusColor = 'bg-blue-50 text-blue-700 border border-blue-200 font-bold';
+        else if (ord.fulfillmentStatus === 'Out for Delivery') statusColor = 'bg-purple-50 text-purple-700 border border-purple-200 font-bold';
+        else if (ord.fulfillmentStatus === 'Packed') statusColor = 'bg-amber-50 text-amber-700 border border-amber-200 font-bold';
+        else if (ord.fulfillmentStatus === 'Cancelled') statusColor = 'bg-rose-50 text-rose-700 border border-rose-200 font-bold';
+
+        const shipBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${statusColor}">${ord.fulfillmentStatus || 'Processing'}</span>`;
+
+        const trackingBlock = ord.trackingNumber 
+          ? `<div class="mt-1 font-mono text-[10px] text-slate-500 bg-slate-50 p-1 rounded border border-slate-100">
+               <span class="font-semibold text-slate-700">${ord.courier || 'Courier'}:</span> ${ord.trackingNumber}
+             </div>`
+          : '';
+
+        const addressBlock = ord.address 
+          ? `<div class="text-[11px] text-slate-500 mt-0.5 max-w-xs truncate" title="${ord.address}">📍 ${ord.address}</div>`
+          : '';
+
+        const phoneBlock = ord.phone
+          ? `<div class="text-[11px] font-mono text-slate-400">📞 ${ord.phone}</div>`
+          : '';
+
+        return `
+          <tr class="hover:bg-slate-50/70 transition-colors">
+            <td class="py-2.5 px-4">
+              <span class="font-bold text-slate-900">${ord.id}</span>
+              <span class="block text-[11px] text-slate-400 font-mono">${dateStr}</span>
+            </td>
+            <td class="py-2.5 px-4 font-semibold text-slate-800">
+              ${ord.customer}
+              <span class="block text-[11px] text-slate-400 font-normal">${ord.channel}</span>
+              ${phoneBlock}
+              ${addressBlock}
+            </td>
+            <td class="py-2.5 px-4">
+              <div class="text-slate-800 font-medium">${ord.productName}</div>
+              <div class="text-[11px] text-slate-500 font-mono">Qty: <strong>${ord.quantity}</strong> (${ord.sku})</div>
+            </td>
+            <td class="py-2.5 px-4 text-right font-bold text-slate-900">${cur}${Number(ord.total).toFixed(2)}</td>
+            <td class="py-2.5 px-4">${paymentBadge}</td>
+            <td class="py-2.5 px-4">
+              ${shipBadge}
+              ${trackingBlock}
+            </td>
+            <td class="py-2.5 px-4 text-right">
+              <button onclick="openOrderUpdateModal('${ord.id}')" title="Edit fulfillment / tracking" class="px-2.5 py-1 text-xs font-semibold theme-accent-text hover:bg-amber-50 rounded-lg border border-amber-200 transition-colors">
+                Update
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function openOrderUpdateModal(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return;
+
+      document.getElementById('edit-order-id').value = order.id;
+      document.getElementById('modal-order-title').innerText = `Update ${order.id}`;
+      document.getElementById('modal-order-subtitle').innerText = `${order.customer} • ${order.productName} (x${order.quantity})`;
+      document.getElementById('edit-order-payment').value = order.paymentStatus || 'Paid (UPI / GPay)';
+      document.getElementById('edit-order-fulfillment').value = order.fulfillmentStatus || 'Processing';
+      document.getElementById('edit-order-courier').value = order.courier || '';
+      document.getElementById('edit-order-tracking').value = order.trackingNumber || '';
+      document.getElementById('edit-order-address').value = order.address || '';
+      document.getElementById('edit-order-phone').value = order.phone || '';
+
+      document.getElementById('order-update-modal').classList.remove('hidden');
+    }
+
+    function closeOrderUpdateModal() {
+      document.getElementById('order-update-modal').classList.add('hidden');
+    }
+
+    function handleSaveOrderUpdate(e) {
+      e.preventDefault();
+      const orderId = document.getElementById('edit-order-id').value;
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return;
+
+      order.paymentStatus = document.getElementById('edit-order-payment').value;
+      order.fulfillmentStatus = document.getElementById('edit-order-fulfillment').value;
+      order.courier = document.getElementById('edit-order-courier').value.trim();
+      order.trackingNumber = document.getElementById('edit-order-tracking').value.trim();
+      order.address = document.getElementById('edit-order-address').value.trim();
+      order.phone = document.getElementById('edit-order-phone').value.trim();
+
+      saveData();
+      closeOrderUpdateModal();
+      showToast(`Order ${order.id} fulfillment details updated!`);
+    }
+
+    // --- 11. IN-APP CUSTOMIZATION & BRANDING ---
+    function loadSettingsForm() {
+      document.getElementById('setting-business-name').value = config.businessName || '';
+      document.getElementById('setting-tagline').value = config.tagline || '';
+      document.getElementById('setting-logo-url').value = config.logoUrl || '';
+      document.getElementById('setting-instagram').value = config.instagramHandle || 'https://instagram.com/byeoltara';
+      document.getElementById('setting-currency').value = config.currency || '₹';
+      document.getElementById('setting-theme-color').value = config.themeColor || 'gold';
+      renderCategoriesManagement();
+    }
+
+    function handleSaveBranding(e) {
+      e.preventDefault();
+      config.businessName = document.getElementById('setting-business-name').value.trim() || 'Byeol Tara';
+      config.tagline = document.getElementById('setting-tagline').value.trim();
+      config.logoUrl = document.getElementById('setting-logo-url').value.trim();
+
+      // Extract username from link or handle
+      let igInput = document.getElementById('setting-instagram').value.trim();
+      igInput = igInput.replace(/^(?:https?:\/\/)?(?:www\.)?instagram\.com\//i, '').replace(/^@/, '').replace(/\/.*$/, '');
+      config.instagramHandle = igInput || 'byeoltara';
+
+      config.currency = document.getElementById('setting-currency').value;
+      config.themeColor = document.getElementById('setting-theme-color').value;
+
+      saveData();
+      showToast("Store theme, branding & Instagram updated!");
+    }
+
+    function updateOrderPricePreview() {
+      const select = document.getElementById('order-product-select');
+      const selectedOption = select.options[select.selectedIndex];
+      if (!selectedOption) return;
+
+      const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+      const qty = parseInt(document.getElementById('order-qty').value, 10) || 1;
+      document.getElementById('order-total').value = (price * qty).toFixed(2);
+    }
+
+    function handleCreateOrder(e) {
+      e.preventDefault();
+      const select = document.getElementById('order-product-select');
+      const prodId = select.value;
+      const prod = products.find(p => p.id === prodId);
+
+      if (!prod) {
+        showToast("Please choose a valid product", "error");
+        return;
+      }
+
+      const qty = parseInt(document.getElementById('order-qty').value, 10) || 1;
+      if (prod.stock < qty) {
+        showToast(`Not enough stock! Available: ${prod.stock}`, "error");
+        return;
+      }
+
+      const customer = document.getElementById('order-customer').value.trim();
+      const channel = document.getElementById('order-channel').value.trim() || 'Direct';
+      const total = parseFloat(document.getElementById('order-total').value) || 0;
+      const paymentStatus = document.getElementById('order-payment-status').value;
+      const fulfillmentStatus = document.getElementById('order-fulfillment-status').value;
+
+      prod.stock -= qty;
+
+      const newOrder = {
+        id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
+        date: new Date().toISOString(),
+        customer,
+        channel,
+        productName: prod.name,
+        sku: prod.sku,
+        quantity: qty,
+        total,
+        paymentStatus,
+        fulfillmentStatus
+      };
+      orders.unshift(newOrder);
+
+      movements.unshift({
+        id: "mov-" + Date.now(),
+        timestamp: new Date().toISOString(),
+        productName: prod.name,
+        sku: prod.sku,
+        type: "Sale (-)",
+        delta: -qty,
+        newStock: prod.stock,
+        notes: `Order ${newOrder.id} for ${customer} (${channel})`
+      });
+
+      saveData();
+      document.getElementById('order-form').reset();
+      populateOrderProductDropdown();
+      showToast(`Order ${newOrder.id} saved & stock deducted!`);
+    }
+
+    function renderOrdersTable() {
+      const cur = config.currency || '$';
+      const tbody = document.getElementById('orders-tbody');
+      const empty = document.getElementById('empty-orders-state');
+      document.getElementById('orders-count-label').innerText = `${orders.length} total orders logged`;
+
+      if (!orders.length) {
+        tbody.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      tbody.innerHTML = orders.map(ord => {
+        const dateStr = new Date(ord.date).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        
+        let paymentBadge = ord.paymentStatus === 'Paid'
+          ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Paid</span>'
+          : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Pending</span>';
+
+        let shipBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700">' + ord.fulfillmentStatus + '</span>';
+
+        return `
+          <tr class="hover:bg-slate-50/70 transition-colors">
+            <td class="py-2.5 px-4">
+              <span class="font-bold text-slate-900">${ord.id}</span>
+              <span class="block text-[11px] text-slate-400 font-mono">${dateStr}</span>
+            </td>
+            <td class="py-2.5 px-4 font-semibold text-slate-800">
+              ${ord.customer}
+              <span class="block text-[11px] text-slate-400 font-normal">${ord.channel}</span>
+            </td>
+            <td class="py-2.5 px-4">
+              <div class="text-slate-800 font-medium">${ord.productName}</div>
+              <div class="text-[11px] text-slate-500 font-mono">Qty: <strong>${ord.quantity}</strong> (${ord.sku})</div>
+            </td>
+            <td class="py-2.5 px-4 text-right font-bold text-slate-900">${cur}${Number(ord.total).toFixed(2)}</td>
+            <td class="py-2.5 px-4">${paymentBadge}</td>
+            <td class="py-2.5 px-4">${shipBadge}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // --- 11. IN-APP CUSTOMIZATION & BRANDING ---
+    function loadSettingsForm() {
+      document.getElementById('setting-business-name').value = config.businessName || '';
+      document.getElementById('setting-tagline').value = config.tagline || '';
+      document.getElementById('setting-logo-url').value = config.logoUrl || '';
+      document.getElementById('setting-instagram').value = config.instagramHandle || 'byeoltara';
+      document.getElementById('setting-currency').value = config.currency || '₹';
+      document.getElementById('setting-theme-color').value = config.themeColor || 'gold';
+      renderCategoriesManagement();
+      renderInstagramAccountsSettings();
+    }
+
+    function handleSaveBranding(e) {
+      e.preventDefault();
+      config.businessName = document.getElementById('setting-business-name').value.trim() || 'Byeol Tara';
+      config.tagline = document.getElementById('setting-tagline').value.trim();
+      config.logoUrl = document.getElementById('setting-logo-url').value.trim();
+
+      // Extract username from link or handle
+      let igInput = document.getElementById('setting-instagram').value.trim();
+      igInput = igInput.replace(/^(?:https?:\/\/)?(?:www\.)?instagram\.com\//i, '').replace(/^@/, '').replace(/\/.*$/, '');
+      config.instagramHandle = igInput || 'byeoltara';
+
+      // Keep primary account in sync
+      if (config.instagramAccounts && config.instagramAccounts.length > 0) {
+        const primary = config.instagramAccounts.find(a => a.isPrimary) || config.instagramAccounts[0];
+        primary.handle = config.instagramHandle;
+      }
+
+      config.currency = document.getElementById('setting-currency').value;
+      config.themeColor = document.getElementById('setting-theme-color').value;
+
+      saveData();
+      showToast("Store theme, branding & Instagram updated!");
+    }
+
+    function handleLogoFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        showToast("Please select a valid image file", "error");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        config.logoUrl = e.target.result;
+        document.getElementById('setting-logo-url').value = e.target.result;
+        saveData();
+        showToast("Logo uploaded and updated successfully!");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearLogo() {
+      config.logoUrl = '';
+      document.getElementById('setting-logo-url').value = '';
+      saveData();
+      showToast("Reset to default icon");
+    }
+
+    // --- 11.5. MULTI-INSTAGRAM ACCOUNT MANAGEMENT ---
+    function renderInstagramAccountsSettings() {
+      const container = document.getElementById('ig-accounts-settings-list');
+      if (!container) return;
+
+      if (!config.instagramAccounts || config.instagramAccounts.length === 0) {
+        container.innerHTML = '<div class="text-xs text-slate-400">No Instagram accounts connected.</div>';
+        return;
+      }
+
+      container.innerHTML = config.instagramAccounts.map((acc, idx) => `
+        <div class="flex items-center justify-between p-3 rounded-xl ${acc.isPrimary ? 'bg-amber-50/70 border border-amber-200' : 'bg-slate-50 border border-slate-200'} text-xs">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-rose-500 text-white flex items-center justify-center font-bold">
+              <i data-lucide="instagram" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-900">@${acc.handle}</span>
+                ${acc.isPrimary ? '<span class="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-bold">Primary</span>' : ''}
+              </div>
+              <span class="text-slate-500 text-[11px]">${acc.label || 'Sub-brand page'}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5">
+            ${!acc.isPrimary ? `
+              <button onclick="setPrimaryInstagramPage(${idx})" class="px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:text-slate-900 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+                Set Primary
+              </button>
+            ` : ''}
+            <a href="https://instagram.com/${acc.handle}" target="_blank" rel="noopener noreferrer" class="p-1.5 text-slate-500 hover:text-rose-600 rounded-lg hover:bg-white transition-colors" title="Open Page">
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+            ${config.instagramAccounts.length > 1 ? `
+              <button onclick="handleRemoveInstagramPage(${idx})" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-white transition-colors" title="Remove Account">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function renderInstagramHubAccounts() {
+      const container = document.getElementById('ig-accounts-hub-list');
+      if (!container) return;
+
+      const accounts = config.instagramAccounts || [{ handle: config.instagramHandle || 'byeoltara', label: 'Main Shop', isPrimary: true }];
+
+      container.innerHTML = accounts.map((acc, idx) => `
+        <div class="p-3 rounded-xl border ${acc.isPrimary ? 'border-amber-300 bg-amber-50/50' : 'border-slate-200 bg-slate-50/70'} flex flex-col justify-between gap-3">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold uppercase tracking-wider ${acc.isPrimary ? 'text-amber-800' : 'text-slate-500'}">
+                ${acc.label || 'Instagram Page'}
+              </span>
+              ${acc.isPrimary ? '<span class="w-2 h-2 rounded-full bg-emerald-500"></span>' : ''}
+            </div>
+            <div class="font-bold text-slate-900 text-sm mt-0.5">@${acc.handle}</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="https://instagram.com/${acc.handle}" target="_blank" rel="noopener noreferrer" class="flex-1 py-1.5 text-center text-xs font-bold rounded-lg bg-white border border-slate-200 text-slate-800 hover:bg-slate-50 transition-colors flex items-center justify-center gap-1">
+              <span>Open</span>
+              <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+            <button onclick="copySpecificInstagramLink('${acc.handle}')" title="Copy profile URL" class="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition-colors">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+            </button>
+            ${!acc.isPrimary ? `
+              <button onclick="setPrimaryInstagramPage(${idx})" title="Set as primary" class="px-2 py-1.5 rounded-lg text-xs font-semibold theme-accent-bg text-white transition-opacity">
+                Select
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function handleAddInstagramPage() {
+      const handleInput = document.getElementById('new-ig-handle');
+      const labelInput = document.getElementById('new-ig-label');
+      
+      let handle = handleInput.value.trim().replace(/^(?:https?:\/\/)?(?:www\.)?instagram\.com\//i, '').replace(/^@/, '').replace(/\/.*$/, '');
+      const label = labelInput.value.trim() || 'Sub-brand page';
+
+      if (!handle) {
+        showToast("Please enter an Instagram handle", "error");
+        return;
+      }
+
+      if (config.instagramAccounts.some(a => a.handle.toLowerCase() === handle.toLowerCase())) {
+        showToast("This handle is already registered!", "error");
+        return;
+      }
+
+      config.instagramAccounts.push({
+        handle: handle,
+        label: label,
+        isPrimary: config.instagramAccounts.length === 0
+      });
+
+      handleInput.value = '';
+      labelInput.value = '';
+      saveData();
+      renderInstagramAccountsSettings();
+      showToast(`Added @${handle} to Instagram Hub!`);
+    }
+
+    function setPrimaryInstagramPage(index) {
+      if (!config.instagramAccounts[index]) return;
+      config.instagramAccounts.forEach((acc, i) => {
+        acc.isPrimary = (i === index);
+      });
+      config.instagramHandle = config.instagramAccounts[index].handle;
+      saveData();
+      renderInstagramAccountsSettings();
+      showToast(`Switched active page to @${config.instagramHandle}`);
+    }
+
+    function handleRemoveInstagramPage(index) {
+      if (config.instagramAccounts.length <= 1) {
+        showToast("You need at least one Instagram account registered", "error");
+        return;
+      }
+      const removed = config.instagramAccounts.splice(index, 1)[0];
+      if (removed.isPrimary && config.instagramAccounts.length > 0) {
+        config.instagramAccounts[0].isPrimary = true;
+        config.instagramHandle = config.instagramAccounts[0].handle;
+      }
+      saveData();
+      renderInstagramAccountsSettings();
+      showToast(`Removed @${removed.handle}`);
+    }
+
+    function quickLogFromInstagram() {
+      switchTab('orders');
+      document.getElementById('order-channel').value = 'Instagram DM';
+      document.getElementById('order-customer').focus();
+    }
+
+    function copySpecificInstagramLink(handle) {
+      const clean = handle.replace(/^@/, '').trim();
+      const url = `https://instagram.com/${clean}`;
+      copyTextToClipboard(url);
+      showToast(`Copied ${url} to clipboard!`);
+    }
+
+    function copyInstagramLink() {
+      const activeAccount = (config.instagramAccounts && config.instagramAccounts.find(a => a.isPrimary)) || 
+                            { handle: config.instagramHandle || 'byeoltara' };
+      copySpecificInstagramLink(activeAccount.handle);
+    }
+
+    function copyTextToClipboard(text) {
+      const tempInput = document.createElement('input');
+      tempInput.value = text;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+    }
+
+    function renderCategoriesManagement() {
+      const container = document.getElementById('categories-management-list');
+      if (!config.categories || config.categories.length === 0) {
+        container.innerHTML = '<div class="text-xs text-slate-400">No custom categories. Add one above!</div>';
+        return;
+      }
+
+      container.innerHTML = config.categories.map((cat, idx) => `
+        <div class="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+          <span class="font-medium text-slate-800">${cat}</span>
+          <button onclick="handleRemoveCategory(${idx})" class="text-slate-400 hover:text-rose-600 p-1 transition-colors">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function handleAddCategory() {
+      const input = document.getElementById('new-category-input');
+      const val = input.value.trim();
+      if (!val) return;
+      if (config.categories.includes(val)) {
+        showToast("Category already exists", "error");
+        return;
+      }
+
+      config.categories.push(val);
+      input.value = '';
+      saveData();
+      renderCategoriesManagement();
+      showToast(`Category "${val}" added!`);
+    }
+
+    function handleRemoveCategory(idx) {
+      const cat = config.categories[idx];
+      config.categories.splice(idx, 1);
+      saveData();
+      renderCategoriesManagement();
+      showToast(`Removed "${cat}"`);
+    }
+
+    // --- 12. CSV EXPORTS ---
+    function exportInventoryCSV() {
+      const headers = ["SKU", "Product Name", "Category", "Cost Price", "Selling Price", "In Stock", "Alert Threshold", "Estimated Margin %"];
+      const rows = products.map(p => {
+        const marginPct = p.price > 0 ? (((p.price - p.cost) / p.price) * 100).toFixed(0) : 0;
+        return [
+          `"${p.sku}"`,
+          `"${p.name.replace(/"/g, '""')}"`,
+          `"${(p.category || '').replace(/"/g, '""')}"`,
+          p.cost,
+          p.price,
+          p.stock,
+          p.threshold,
+          `${marginPct}%`
+        ];
+      });
+
+      const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      downloadBlob(csvContent, `${config.businessName.toLowerCase()}_inventory_${new Date().toISOString().slice(0, 10)}.csv`, 'text/csv');
+      showToast("Inventory exported to CSV");
+    }
+
+    function exportOrdersCSV() {
+      const headers = ["Order ID", "Date", "Customer", "Channel", "Product", "SKU", "Quantity", "Total Amount", "Payment Status", "Fulfillment Status"];
+      const rows = orders.map(o => [
+        `"${o.id}"`,
+        `"${o.date}"`,
+        `"${o.customer.replace(/"/g, '""')}"`,
+        `"${(o.channel || '').replace(/"/g, '""')}"`,
+        `"${o.productName.replace(/"/g, '""')}"`,
+        `"${o.sku}"`,
+        o.quantity,
+        o.total,
+        `"${o.paymentStatus}"`,
+        `"${o.fulfillmentStatus}"`
+      ]);
+
+      const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      downloadBlob(csvContent, `${config.businessName.toLowerCase()}_orders_${new Date().toISOString().slice(0, 10)}.csv`, 'text/csv');
+      showToast("Orders exported to CSV");
+    }
+
+    function downloadBlob(content, filename, contentType) {
+      const blob = new Blob([content], { type: contentType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // --- 13. BACKUP & RESTORE ---
+    function downloadJsonBackup() {
+      const backupData = {
+        exportedAt: new Date().toISOString(),
+        config,
+        products,
+        movements,
+        orders
+      };
+      downloadBlob(JSON.stringify(backupData, null, 2), `${config.businessName.toLowerCase()}_backup_${new Date().toISOString().slice(0,10)}.json`, 'application/json');
+      showToast("JSON backup created");
+    }
+
+    function restoreJsonBackup(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed.products && Array.isArray(parsed.products)) {
+            products = parsed.products;
+            movements = parsed.movements || [];
+            orders = parsed.orders || [];
+            if (parsed.config) {
+              config = { ...DEFAULT_CONFIG, ...parsed.config };
+            }
+            saveData();
+            loadSettingsForm();
+            showToast("Backup restored successfully!");
+          } else {
+            showToast("Invalid backup JSON format", "error");
+          }
+        } catch (err) {
+          showToast("Failed to parse backup file", "error");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function loadSampleDataset() {
+      config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+      products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+      movements = JSON.parse(JSON.stringify(DEFAULT_MOVEMENTS));
+      orders = JSON.parse(JSON.stringify(DEFAULT_ORDERS));
+      saveData();
+      loadSettingsForm();
+      showToast("Sample demo data reloaded");
+    }
+
+    function clearAllData() {
+      if (confirm("Are you sure you want to clear all data? This cannot be undone.")) {
+        products = [];
+        movements = [];
+        orders = [];
+        saveData();
+        showToast("All data wiped", "error");
+      }
+    }
+
+    // --- 14. APP INITIALIZATION ---
+    function refreshUI() {
+      updateMetrics();
+      renderInventoryTable();
+      renderMovementsTable();
+      renderOrdersTable();
+      populateOrderProductDropdown();
+      loadSettingsForm();
+      lucide.createIcons();
+    }
+
+    window.onload = function() {
+      checkAuth();
+      applyTheme();
+      refreshUI();
+    };
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="app-browser-title">Byeol Tara — Jewelry Inventory & Orders</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Dynamic Theme Color Variables */
+    :root {
+      --primary-color: #b47a16;
+      --primary-hover: #925f0e;
+      --primary-light: #fef7ea;
+      --primary-ring: rgba(180, 122, 22, 0.25);
+    }
+    .theme-accent-bg { background-color: var(--primary-color) !important; }
+    .theme-accent-bg:hover { background-color: var(--primary-hover) !important; }
+    .theme-accent-text { color: var(--primary-color) !important; }
+    .theme-accent-border { border-color: var(--primary-color) !important; }
+    .theme-accent-light-bg { background-color: var(--primary-light) !important; }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .modal-backdrop {
+      background-color: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+    }
+    .auth-backdrop {
+      background: radial-gradient(circle at 50% 30%, #2e1c02 0%, #0f172a 100%);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- PASSCODE / PIN LOGIN OVERLAY -->
+  <div id="auth-lockscreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 auth-backdrop">
+    <div class="bg-slate-900/90 border border-amber-500/30 p-7 sm:p-8 rounded-3xl max-w-sm w-full shadow-2xl backdrop-blur-xl text-center space-y-5">
+      <!-- Medallion Icon -->
+      <div class="w-16 h-16 mx-auto rounded-full p-1 bg-[#c8881b] shadow-lg border border-yellow-300/40 flex items-center justify-center">
+        <svg class="w-full h-full p-0.5" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="48" fill="#bc821e"/>
+          <circle cx="50" cy="50" r="45" stroke="#fef08a" stroke-width="1.5" stroke-opacity="0.9"/>
+          <g transform="translate(50, 50) scale(0.68)">
+            <path d="M0 -34 L5 -12 L24 -24 L12 -5 L34 0 L12 5 L24 24 L5 12 L0 34 L-5 12 L-24 24 L-12 5 L-34 0 L-12 -5 L-24 -24 L-5 -12 Z" fill="#fffbeb" stroke="#ca8a04" stroke-width="0.8"/>
+            <circle cx="0" cy="0" r="3.5" fill="#fef08a"/>
+          </g>
+          <text x="50" y="87" text-anchor="middle" font-family="'Plus Jakarta Sans', serif" font-weight="800" font-size="7.5" fill="#fffbeb" letter-spacing="1.5">BYT</text>
+        </svg>
+      </div>
+
+      <div>
+        <h2 class="text-lg font-bold text-white tracking-wide">Byeol Tara</h2>
+        <p class="text-xs text-amber-200/70 mt-0.5">Private Inventory & Orders Portal</p>
+      </div>
+
+      <form onsubmit="handleAuthLogin(event)" class="space-y-4 pt-1">
+        <div>
           <label class="block text-xs font-semibold text-slate-300 text-left mb-1.5">Owner Access Passcode</label>
           <div class="relative">
             <input 
