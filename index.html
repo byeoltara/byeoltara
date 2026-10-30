@@ -94,19 +94,28 @@
       </div>
 
       <nav class="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-        <div class="relative hidden sm:block">
+        <div class="relative hidden lg:block">
           <select id="nav-insta-quick-select" onchange="handleHeaderProfileSwitch(this.value)" class="text-[11px] font-semibold bg-white border border-slate-200 text-slate-700 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-amber-500 shadow-sm cursor-pointer"></select>
         </div>
 
         <button onclick="switchTab('inventory')" id="tab-btn-inventory" class="nav-tab px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 text-white shadow-sm transition">
           Inventory
         </button>
+
         <button onclick="switchTab('orders')" id="tab-btn-orders" class="nav-tab px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">
-          Orders
+          Orders Logger
         </button>
+
+        <button onclick="openActiveInstagramProfile()" title="Launch Instagram Profile" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-rose-50 hover:text-rose-600 border border-slate-200 transition flex items-center gap-1.5 shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 inline-block"></span>
+          <span>Instagram</span>
+          <span class="text-[10px] text-slate-400">↗</span>
+        </button>
+
         <button onclick="switchTab('settings')" id="tab-btn-settings" class="nav-tab px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">
           Customize
         </button>
+
         <button onclick="lockScreen()" title="Lock Studio" class="p-2 text-slate-400 hover:text-slate-800 rounded-lg hover:bg-slate-100 transition">
           🔒
         </button>
@@ -165,14 +174,8 @@
         <div class="flex-1 flex gap-2">
           <input type="text" id="inventory-search" placeholder="Search by SKU, piece title, or category..." oninput="renderInventoryTable()"
             class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500">
-          <select id="inventory-cat-filter" onchange="renderInventoryTable()" class="text-xs px-3 py-2 rounded-xl border border-slate-200 bg-white focus:outline-none">
-            <option value="ALL">All Categories</option>
-            <option value="Korean Dainty">Korean Dainty</option>
-            <option value="Indian Boho Silver">Indian Boho Silver</option>
-            <option value="Rings & Bands">Rings & Bands</option>
-            <option value="Earrings & Jhumkas">Earrings & Jhumkas</option>
-            <option value="Necklaces & Chokers">Necklaces & Chokers</option>
-            <option value="Bracelets & Bangles">Bracelets & Bangles</option>
+          <select id="inventory-cat-filter" onchange="renderInventoryTable()" class="text-xs px-3 py-2 rounded-xl border border-slate-200 bg-white focus:outline-none min-w-[150px]">
+            <!-- Dynamic Category Options populated via JS -->
           </select>
         </div>
         <button onclick="openProductModal()" class="px-4 py-2.5 bg-gradient-to-r from-amber-600 to-amber-500 text-white font-bold rounded-xl text-xs shadow-sm hover:opacity-95 transition flex items-center justify-center gap-2">
@@ -236,6 +239,39 @@
     <!-- TAB 3: CUSTOMIZE & SETTINGS -->
     <section id="tab-settings" class="tab-pane hidden space-y-6 max-w-4xl mx-auto">
       
+      <!-- NEW: Jewelry Categories & Types Customizer -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+              Jewelry Types & Categories
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">Add or remove jewelry types as you expand the Byeol Tara collections.</p>
+          </div>
+          <span class="text-[11px] font-semibold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200" id="cat-count-badge">
+            0 Types
+          </span>
+        </div>
+
+        <!-- Add Category Form -->
+        <div class="flex gap-2">
+          <input type="text" id="new-category-input" placeholder="e.g. Nose Pins & Septum, Anklets, Charm Pendants..." 
+            class="flex-1 text-xs px-3.5 py-2.5 border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-amber-500">
+          <button onclick="handleAddCategory()" class="px-4 py-2.5 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-xl text-xs font-bold hover:opacity-95 shadow-sm transition flex-shrink-0">
+            + Add Type
+          </button>
+        </div>
+
+        <!-- Active Category Pills Display -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-600 mb-2">Active Jewelry Types in Store</label>
+          <div id="settings-categories-list" class="flex flex-wrap gap-2">
+            <!-- Dynamic Category Pills populated via JS -->
+          </div>
+        </div>
+      </div>
+
       <!-- Store Branding, Logo & Profile -->
       <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-5">
         <div>
@@ -485,14 +521,9 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Category</label>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Category / Type</label>
             <select id="prod-category" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-white focus:border-amber-500 focus:outline-none">
-              <option value="Korean Dainty">Korean Dainty</option>
-              <option value="Indian Boho Silver">Indian Boho Silver</option>
-              <option value="Rings & Bands">Rings & Bands</option>
-              <option value="Earrings & Jhumkas">Earrings & Jhumkas</option>
-              <option value="Necklaces & Chokers">Necklaces & Chokers</option>
-              <option value="Bracelets & Bangles">Bracelets & Bangles</option>
+              <!-- Dynamically populated categories -->
             </select>
           </div>
           <div>
@@ -611,6 +642,15 @@
   <script>
     const DEFAULT_PASS_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
 
+    const DEFAULT_CATEGORIES = [
+      "Korean Dainty",
+      "Indian Boho Silver",
+      "Rings & Bands",
+      "Earrings & Jhumkas",
+      "Necklaces & Chokers",
+      "Bracelets & Bangles"
+    ];
+
     const DEFAULT_CONFIG = {
       storeName: "Byeol Tara",
       tagline: "Korean Dainty & Indian Boho Silver Vault",
@@ -620,6 +660,7 @@
       email: "",
       shippingNote: "Orders dispatched within 24-48 hours. Unboxing video mandatory for any claims.",
       passcodeHash: DEFAULT_PASS_HASH,
+      categories: DEFAULT_CATEGORIES,
       instagramAccounts: [
         {
           handle: "byeoltara.silver",
@@ -655,6 +696,10 @@
     ];
 
     let config = JSON.parse(localStorage.getItem('byeoltara_config')) || DEFAULT_CONFIG;
+    if (!config.categories || config.categories.length === 0) {
+      config.categories = DEFAULT_CATEGORIES;
+    }
+
     let products = JSON.parse(localStorage.getItem('byeoltara_products')) || INITIAL_PRODUCTS;
     let orders = JSON.parse(localStorage.getItem('byeoltara_orders')) || INITIAL_ORDERS;
     let isAuthenticated = false;
@@ -684,11 +729,13 @@
       localStorage.setItem('byeoltara_config', JSON.stringify(config));
       applyBrandStyling();
       renderAllInstagramViews();
+      syncCategoryDropdowns();
     }
 
     function saveProducts() {
       localStorage.setItem('byeoltara_products', JSON.stringify(products));
       renderInventoryTable();
+      renderCategoriesList();
     }
 
     function saveOrders() {
@@ -696,6 +743,94 @@
       renderOrdersTable();
     }
 
+    // ================= DYNAMIC CATEGORIES MANAGEMENT =================
+    function handleAddCategory() {
+      const input = document.getElementById('new-category-input');
+      const val = input.value.trim();
+      if (!val) {
+        showToast('Please type a category name');
+        return;
+      }
+
+      if (config.categories.some(c => c.toLowerCase() === val.toLowerCase())) {
+        showToast('This category already exists');
+        return;
+      }
+
+      config.categories.push(val);
+      saveConfig();
+      input.value = '';
+      renderCategoriesList();
+      showToast(`Category "${val}" added!`);
+    }
+
+    function handleDeleteCategory(catName) {
+      const itemCount = products.filter(p => p.category === catName).length;
+      if (itemCount > 0) {
+        if (!confirm(`Warning: ${itemCount} jewelry item(s) are categorized as "${catName}". Deleting this category won't delete the items, but their category tag won't be editable until reassigned. Continue?`)) {
+          return;
+        }
+      } else {
+        if (!confirm(`Remove "${catName}" category?`)) return;
+      }
+
+      config.categories = config.categories.filter(c => c !== catName);
+      saveConfig();
+      renderCategoriesList();
+      renderInventoryTable();
+      showToast(`Category "${catName}" removed`);
+    }
+
+    function renderCategoriesList() {
+      const container = document.getElementById('settings-categories-list');
+      const countBadge = document.getElementById('cat-count-badge');
+      if (!container) return;
+
+      if (!config.categories || config.categories.length === 0) {
+        container.innerHTML = `<span class="text-xs text-slate-400 italic">No categories created yet.</span>`;
+        if (countBadge) countBadge.innerText = '0 Types';
+        return;
+      }
+
+      if (countBadge) countBadge.innerText = `${config.categories.length} Types`;
+
+      container.innerHTML = config.categories.map(cat => {
+        const count = products.filter(p => p.category === cat).length;
+        return `
+          <div class="inline-flex items-center gap-2 bg-amber-50/70 border border-amber-200/80 rounded-xl px-3 py-1.5 text-xs text-slate-800 shadow-sm">
+            <span class="font-bold">${escapeHtml(cat)}</span>
+            <span class="text-[10px] bg-white border border-amber-200 rounded-full px-1.5 py-0.2 font-mono text-amber-800 font-semibold" title="${count} piece(s) in this category">
+              ${count}
+            </span>
+            <button onclick="handleDeleteCategory('${escapeHtml(cat)}')" title="Delete Category" class="text-slate-400 hover:text-rose-600 transition ml-1 text-sm font-bold leading-none">
+              ×
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      syncCategoryDropdowns();
+    }
+
+    function syncCategoryDropdowns() {
+      const invFilter = document.getElementById('inventory-cat-filter');
+      const prodSelect = document.getElementById('prod-category');
+
+      if (invFilter) {
+        const curVal = invFilter.value;
+        invFilter.innerHTML = `
+          <option value="ALL">All Categories (${products.length})</option>
+          ${config.categories.map(cat => `<option value="${escapeHtml(cat)}" ${curVal === cat ? 'selected' : ''}>${escapeHtml(cat)}</option>`).join('')}
+        `;
+      }
+
+      if (prodSelect) {
+        const curSel = prodSelect.value;
+        prodSelect.innerHTML = config.categories.map(cat => `<option value="${escapeHtml(cat)}" ${curSel === cat ? 'selected' : ''}>${escapeHtml(cat)}</option>`).join('');
+      }
+    }
+
+    // ================= BRANDING & LOGO =================
     function applyBrandStyling() {
       const name = config.storeName || 'Byeol Tara';
       const tagline = config.tagline || 'Korean Dainty & Indian Boho Silver Vault';
@@ -815,6 +950,17 @@
       }
     }
 
+    function openActiveInstagramProfile() {
+      let handle = "byeoltara";
+      if (config.instagramAccounts && config.instagramAccounts.length > 0) {
+        const primary = config.instagramAccounts.find(a => a.isPrimary) || config.instagramAccounts[0];
+        if (primary && primary.handle) {
+          handle = primary.handle.replace('@', '');
+        }
+      }
+      window.open(`https://instagram.com/${encodeURIComponent(handle)}`, '_blank', 'noopener,noreferrer');
+    }
+
     // ================= INVENTORY =================
     function renderInventoryTable() {
       const tbody = document.getElementById('inventory-table-body');
@@ -822,7 +968,7 @@
       const cat = document.getElementById('inventory-cat-filter')?.value || 'ALL';
 
       let filtered = products.filter(p => {
-        const matchesSearch = p.title.toLowerCase().includes(search) || p.sku.toLowerCase().includes(search) || p.category.toLowerCase().includes(search);
+        const matchesSearch = p.title.toLowerCase().includes(search) || p.sku.toLowerCase().includes(search) || (p.category && p.category.toLowerCase().includes(search));
         const matchesCat = cat === 'ALL' || p.category === cat;
         return matchesSearch && matchesCat;
       });
@@ -851,7 +997,7 @@
               <p class="text-[10px] font-mono text-slate-400">${escapeHtml(p.sku)}</p>
             </td>
             <td class="py-3 px-4">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-700">${escapeHtml(p.category)}</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-800 border border-amber-200/60">${escapeHtml(p.category)}</span>
             </td>
             <td class="py-3 px-4 text-center">
               <span class="font-mono font-bold ${isLow ? 'text-rose-600' : 'text-slate-800'}">${p.stock}</span>
@@ -884,6 +1030,7 @@
     }
 
     function openProductModal(prod = null) {
+      syncCategoryDropdowns();
       document.getElementById('modal-product').classList.remove('hidden');
       document.getElementById('modal-product').classList.add('flex');
       if (prod) {
@@ -948,7 +1095,7 @@
       showToast('Item deleted');
     }
 
-    // ================= ORDERS & ADDRESS MANAGEMENT =================
+    // ================= ORDERS =================
     function renderOrdersTable() {
       const tbody = document.getElementById('orders-table-body');
       if (orders.length === 0) {
@@ -970,14 +1117,12 @@
               <p class="text-[10px] text-slate-400">${escapeHtml(o.date)}</p>
             </td>
 
-            <!-- Client, Phone & Address Column -->
             <td class="py-3 px-4">
               <div class="flex items-center gap-1.5 font-bold text-slate-900">
                 <span>${escapeHtml(o.customer)}</span>
                 ${o.handle ? `<span class="text-[10px] text-amber-700 font-normal">(${escapeHtml(o.handle)})</span>` : ''}
               </div>
 
-              <!-- Phone & WhatsApp -->
               <div class="flex items-center gap-1.5 mt-0.5 text-[11px] text-slate-600 font-mono">
                 <span>📞 ${escapeHtml(o.phone || 'No Phone')}</span>
                 ${cleanPhone ? `
@@ -987,7 +1132,6 @@
                 ` : ''}
               </div>
 
-              <!-- Address Box + Pre-Packing Edit Action -->
               <div class="mt-1.5 p-2 bg-slate-50 rounded-lg border border-slate-200/80 text-[11px] text-slate-600 max-w-xs relative">
                 <p class="leading-relaxed whitespace-pre-line">${safeAddr || '<span class="text-slate-400 italic">No address provided</span>'}</p>
                 
@@ -998,7 +1142,6 @@
                     </button>
                   ` : '<span></span>'}
 
-                  <!-- Can ONLY update address before it is Packed -->
                   ${!isPackedOrBeyond ? `
                     <button type="button" onclick="openEditAddressModal('${o.id}')" class="text-[10px] text-blue-600 hover:text-blue-800 font-bold px-2 py-0.5 rounded bg-blue-50 border border-blue-200 hover:bg-blue-100 transition">
                       ✏️ Edit Address
@@ -1449,6 +1592,7 @@
       document.getElementById('setting-shipping-note').value = config.shippingNote || '';
 
       updateLogoPreviewFromInput();
+      renderCategoriesList();
       renderInstagramAccountsList();
     }
 
@@ -1514,17 +1658,21 @@
     }
 
     function resetDemoData() {
-      if (!confirm('Reset products and orders back to default sample data?')) return;
+      if (!confirm('Reset products, orders, and categories back to sample data?')) return;
+      config.categories = DEFAULT_CATEGORIES;
       products = INITIAL_PRODUCTS;
       orders = INITIAL_ORDERS;
+      saveConfig();
       saveProducts();
       saveOrders();
+      loadSettingsForm();
       showToast('Sample data restored');
     }
 
     window.addEventListener('DOMContentLoaded', () => {
       applyBrandStyling();
       renderAllInstagramViews();
+      renderCategoriesList();
       renderInventoryTable();
       renderOrdersTable();
       loadSettingsForm();
