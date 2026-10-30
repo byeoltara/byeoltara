@@ -906,7 +906,8 @@
       tagline: "Korean Dainty & Indian Boho Silver Jewelry",
       instagramHandle: "byeoltara",
       logoUrl: "",
-      passcode: "1234",
+      // SHA-256 hash for default PIN "1234":
+      passcodeHash: "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",
       currency: "₹",
       themeColor: "gold",
       categories: [
@@ -1035,13 +1036,28 @@
     let activeFilterStatus = 'all';
     let isAuthenticated = sessionStorage.getItem('solostock_authenticated') === 'true';
 
+    // Helper: Cryptographic SHA-256 hash function using Web Crypto API
+    async function sha256(message) {
+      const msgBuffer = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Migration: If existing config stored plain text 'passcode', hash and replace it
+    if (config.passcode) {
+      sha256(String(config.passcode)).then(hash => {
+        config.passcodeHash = hash;
+        delete config.passcode;
+        localStorage.setItem('solostock_config', JSON.stringify(config));
+      });
+    } else if (!config.passcodeHash) {
+      config.passcodeHash = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4"; // "1234"
+    }
+
     // Force default to Gold palette if previously on old default
     if (!config.themeColor || config.themeColor === 'rose') {
       config.themeColor = 'gold';
-    }
-
-    if (!config.passcode) {
-      config.passcode = "1234";
     }
 
     function checkAuth() {
@@ -1056,13 +1072,15 @@
       }
     }
 
-    function handleAuthLogin(e) {
+    async function handleAuthLogin(e) {
       e.preventDefault();
       const input = document.getElementById('auth-passcode-input').value.trim();
       const errorMsg = document.getElementById('auth-error-msg');
-      const expectedPin = config.passcode || "1234";
+      const expectedHash = config.passcodeHash || "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
 
-      if (input === expectedPin) {
+      const inputHash = await sha256(input);
+
+      if (inputHash === expectedHash) {
         isAuthenticated = true;
         sessionStorage.setItem('solostock_authenticated', 'true');
         document.getElementById('auth-lockscreen').classList.add('hidden');
@@ -1082,15 +1100,16 @@
       showToast("Workspace locked");
     }
 
-    function handleChangePasscode(e) {
+    async function handleChangePasscode(e) {
       e.preventDefault();
       const newPin = document.getElementById('setting-new-pin').value.trim();
       if (!newPin) return;
 
-      config.passcode = newPin;
+      config.passcodeHash = await sha256(newPin);
+      delete config.passcode; // Ensure no plain text remnants
       saveData();
       document.getElementById('setting-new-pin').value = '';
-      showToast("Passcode updated successfully!");
+      showToast("Passcode hashed & updated securely!");
     }
 
     function saveData() {
