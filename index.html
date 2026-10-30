@@ -205,15 +205,51 @@
     </section>
 
     <!-- TAB 2: ORDERS LOGGER -->
+<!-- TAB 2: ORDERS LOGGER -->
     <section id="tab-orders" class="tab-pane hidden space-y-6">
+      
+      <!-- Orders Header & Filter Toolbar -->
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200">
         <div>
           <h2 class="font-bold text-slate-900 font-serif text-base">Client Orders & Courier Fulfillment</h2>
-          <p class="text-xs text-slate-500">Log orders, manage addresses before packing, and update courier shipments</p>
+          <p class="text-xs text-slate-500">Track sales performance, client addresses, and parcel delivery statuses</p>
         </div>
-        <button onclick="openOrderModal()" class="px-4 py-2.5 bg-gradient-to-r from-amber-600 to-amber-500 text-white font-bold rounded-xl text-xs shadow-sm hover:opacity-95 transition flex items-center justify-center gap-2">
-          <span>+</span> Log New Order
-        </button>
+        <div class="flex items-center gap-2">
+          <select id="orders-date-filter" onchange="renderOrdersTable()" class="text-xs px-3 py-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:border-amber-500 font-semibold text-slate-700">
+            <option value="ALL">All Time</option>
+            <option value="TODAY">Today</option>
+            <option value="7DAYS">Last 7 Days</option>
+            <option value="30DAYS">Last 30 Days</option>
+            <option value="THIS_MONTH">This Month</option>
+          </select>
+          <button onclick="openOrderModal()" class="px-4 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white font-bold rounded-xl text-xs shadow-sm hover:opacity-95 transition flex items-center justify-center gap-1.5 flex-shrink-0">
+            <span>+</span> Log New Order
+          </button>
+        </div>
+      </div>
+
+      <!-- Orders Sales Summary Metrics -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+          <p class="text-[11px] uppercase tracking-wider font-semibold text-slate-400">Total Sales Value</p>
+          <p class="text-2xl font-bold font-serif text-slate-900 mt-1" id="order-stat-revenue">₹0</p>
+          <p class="text-[10px] text-slate-400 mt-0.5" id="order-stat-count">0 orders</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+          <p class="text-[11px] uppercase tracking-wider font-semibold text-slate-400">Collected (Paid)</p>
+          <p class="text-2xl font-bold font-serif text-emerald-600 mt-1" id="order-stat-paid">₹0</p>
+          <p class="text-[10px] text-slate-400 mt-0.5" id="order-stat-unpaid">Pending: ₹0</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+          <p class="text-[11px] uppercase tracking-wider font-semibold text-slate-400">Avg. Order Value</p>
+          <p class="text-2xl font-bold font-serif text-amber-700 mt-1" id="order-stat-aov">₹0</p>
+          <p class="text-[10px] text-slate-400 mt-0.5">Per client transaction</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+          <p class="text-[11px] uppercase tracking-wider font-semibold text-slate-400">Pieces Sold</p>
+          <p class="text-2xl font-bold font-serif text-slate-800 mt-1" id="order-stat-pieces">0</p>
+          <p class="text-[10px] text-slate-400 mt-0.5">Total units booked</p>
+        </div>
       </div>
 
       <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
@@ -1111,14 +1147,72 @@
     }
 
     // ================= ORDERS =================
-    function renderOrdersTable() {
+function renderOrdersTable() {
       const tbody = document.getElementById('orders-table-body');
-      if (orders.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400">No client orders recorded yet.</td></tr>`;
+      const filter = document.getElementById('orders-date-filter')?.value || 'ALL';
+
+      const now = new Date();
+      const todayStr = now.toISOString().split('T')[0];
+
+      let filtered = orders.filter(o => {
+        if (filter === 'ALL') return true;
+        if (!o.date) return false;
+
+        const orderDate = new Date(o.date);
+        if (isNaN(orderDate.getTime())) return true;
+
+        if (filter === 'TODAY') {
+          return o.date === todayStr;
+        }
+
+        if (filter === '7DAYS') {
+          const diffDays = (now - orderDate) / (1000 * 60 * 60 * 24);
+          return diffDays >= 0 && diffDays <= 7;
+        }
+
+        if (filter === '30DAYS') {
+          const diffDays = (now - orderDate) / (1000 * 60 * 60 * 24);
+          return diffDays >= 0 && diffDays <= 30;
+        }
+
+        if (filter === 'THIS_MONTH') {
+          return orderDate.getFullYear() === now.getFullYear() && orderDate.getMonth() === now.getMonth();
+        }
+
+        return true;
+      });
+
+      // Calculate Sales & Order Metrics for filtered timeframe
+      const totalRevenue = filtered.reduce((sum, o) => sum + Number(o.total || 0), 0);
+      const paidRevenue = filtered.filter(o => o.paymentStatus && o.paymentStatus.startsWith('Paid'))
+                                  .reduce((sum, o) => sum + Number(o.total || 0), 0);
+      const pendingRevenue = totalRevenue - paidRevenue;
+      const totalPiecesSold = filtered.reduce((sum, o) => {
+        return sum + (o.items ? o.items.reduce((acc, i) => acc + Number(i.qty || 1), 0) : 0);
+      }, 0);
+      const aov = filtered.length > 0 ? (totalRevenue / filtered.length) : 0;
+
+      // Update Dashboard Metric Cards
+      const revEl = document.getElementById('order-stat-revenue');
+      const countEl = document.getElementById('order-stat-count');
+      const paidEl = document.getElementById('order-stat-paid');
+      const unpaidEl = document.getElementById('order-stat-unpaid');
+      const aovEl = document.getElementById('order-stat-aov');
+      const piecesEl = document.getElementById('order-stat-pieces');
+
+      if (revEl) revEl.innerText = `${config.currency}${totalRevenue.toLocaleString()}`;
+      if (countEl) countEl.innerText = `${filtered.length} order(s) logged`;
+      if (paidEl) paidEl.innerText = `${config.currency}${paidRevenue.toLocaleString()}`;
+      if (unpaidEl) unpaidEl.innerText = `Pending: ${config.currency}${pendingRevenue.toLocaleString()}`;
+      if (aovEl) aovEl.innerText = `${config.currency}${Math.round(aov).toLocaleString()}`;
+      if (piecesEl) piecesEl.innerText = totalPiecesSold;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400">No orders found for the selected timeframe.</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = orders.slice().reverse().map(o => {
+      tbody.innerHTML = filtered.slice().reverse().map(o => {
         const isDelivered = o.fulfillmentStatus === 'Delivered';
         const isPackedOrBeyond = ['Packed', 'Shipped', 'Delivered'].includes(o.fulfillmentStatus);
         const isPaid = o.paymentStatus && o.paymentStatus.startsWith('Paid');
@@ -1175,7 +1269,7 @@
             </td>
             
             <td class="py-3 px-4 text-right font-mono font-bold text-slate-900">
-              ${config.currency}${o.total}
+              ${config.currency}${Number(o.total || 0).toLocaleString()}
             </td>
 
             <td class="py-3 px-4">
