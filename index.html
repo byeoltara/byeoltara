@@ -580,17 +580,32 @@
           <textarea id="order-address" required rows="2" placeholder="Flat/House No., Street/Area, Landmark, City, State, Pincode" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-amber-500"></textarea>
         </div>
 
-        <div class="border border-slate-200 rounded-2xl p-3 bg-slate-50">
-          <label class="block text-[11px] font-semibold text-slate-700 mb-2">Select Item & Quantity</label>
-          <div class="grid grid-cols-3 gap-2">
-            <div class="col-span-2">
-              <select id="order-prod-select" onchange="syncOrderPrice()" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-none"></select>
+       <!-- MULTI-ITEM ORDER CART BUILDER -->
+        <div class="border border-slate-200 rounded-2xl p-3 bg-slate-50 space-y-2">
+          <label class="block text-[11px] font-semibold text-slate-700">Add Jewelry Pieces to Order</label>
+          <div class="grid grid-cols-12 gap-2">
+            <div class="col-span-8">
+              <select id="order-prod-select" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-none"></select>
             </div>
-            <div>
-              <input type="number" id="order-qty" value="1" min="1" oninput="syncOrderPrice()" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-none">
+            <div class="col-span-2">
+              <input type="number" id="order-qty" value="1" min="1" placeholder="Qty" class="w-full text-xs px-2.5 py-2 border border-slate-200 rounded-xl bg-white focus:outline-none text-center">
+            </div>
+            <div class="col-span-2">
+              <button type="button" onclick="handleAddOrderItem()" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs shadow-sm transition">
+                + Add
+              </button>
             </div>
           </div>
-          <p class="text-right text-[11px] font-semibold text-amber-800 mt-2">Item Total: <span id="order-calc-total">₹0</span></p>
+
+          <!-- Selected Items List -->
+          <div id="order-items-list" class="space-y-1.5 max-h-36 overflow-y-auto pt-1">
+            <!-- Dynamically populated selected items -->
+          </div>
+
+          <div class="flex justify-between items-center pt-2 border-t border-slate-200/80">
+            <span class="text-[11px] text-slate-500 font-medium" id="order-items-count">0 items added</span>
+            <p class="text-right text-xs font-bold text-amber-900">Total: <span id="order-calc-total">₹0</span></p>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1252,10 +1267,14 @@
       }
     }
 
+   // Temporary basket for multi-item orders
+    let currentOrderCart = [];
+
     function openOrderModal() {
+      currentOrderCart = [];
       const select = document.getElementById('order-prod-select');
       select.innerHTML = products.map(p => `
-        <option value="${p.id}" data-price="${p.sellingPrice}">${escapeHtml(p.title)} (${p.sku}) — ${config.currency}${p.sellingPrice} [Stock: ${p.stock}]</option>
+        <option value="${p.id}" data-price="${p.sellingPrice}">${escapeHtml(p.title)} (${p.sku}) — ${config.currency}${p.sellingPrice} [In Stock: ${p.stock}]</option>
       `).join('');
 
       document.getElementById('order-customer').value = '';
@@ -1266,38 +1285,116 @@
       document.getElementById('order-tracking').value = '';
       document.getElementById('order-qty').value = '1';
 
-      syncOrderPrice();
+      renderOrderCartItems();
       document.getElementById('modal-order').classList.remove('hidden');
       document.getElementById('modal-order').classList.add('flex');
     }
 
     function closeOrderModal() {
+      currentOrderCart = [];
       document.getElementById('modal-order').classList.add('hidden');
       document.getElementById('modal-order').classList.remove('flex');
     }
 
-    function syncOrderPrice() {
-      const select = document.getElementById('order-prod-select');
-      const qty = parseInt(document.getElementById('order-qty').value) || 1;
-      const opt = select.options[select.selectedIndex];
-      const price = opt ? parseFloat(opt.getAttribute('data-price')) : 0;
-      document.getElementById('order-calc-total').innerText = `${config.currency}${(price * qty).toFixed(2)}`;
-    }
-
-    function handleSaveOrder(e) {
-      e.preventDefault();
+    function handleAddOrderItem() {
       const select = document.getElementById('order-prod-select');
       const prodId = select.value;
       const prod = products.find(p => p.id === prodId);
-      const qty = parseInt(document.getElementById('order-qty').value) || 1;
+      const qtyInput = document.getElementById('order-qty');
+      const qty = parseInt(qtyInput.value) || 1;
 
       if (!prod) {
         showToast('Please select a piece');
         return;
       }
 
-      prod.stock = Math.max(0, prod.stock - qty);
+      if (qty <= 0) {
+        showToast('Quantity must be at least 1');
+        return;
+      }
+
+      // Check current available stock against existing selections
+      const existingInCart = currentOrderCart.find(i => i.id === prodId);
+      const totalRequested = (existingInCart ? existingInCart.qty : 0) + qty;
+
+      if (totalRequested > prod.stock) {
+        showToast(`Only ${prod.stock} piece(s) available in stock!`);
+        return;
+      }
+
+      if (existingInCart) {
+        existingInCart.qty += qty;
+      } else {
+        currentOrderCart.push({
+          id: prod.id,
+          sku: prod.sku,
+          title: prod.title,
+          price: Number(prod.sellingPrice),
+          qty: qty
+        });
+      }
+
+      qtyInput.value = '1';
+      renderOrderCartItems();
+    }
+
+    function removeOrderCartItem(index) {
+      currentOrderCart.splice(index, 1);
+      renderOrderCartItems();
+    }
+
+    function renderOrderCartItems() {
+      const container = document.getElementById('order-items-list');
+      const countEl = document.getElementById('order-items-count');
+      const totalEl = document.getElementById('order-calc-total');
+
+      if (!container) return;
+
+      if (currentOrderCart.length === 0) {
+        container.innerHTML = `<p class="text-[11px] text-slate-400 py-2 text-center italic bg-white rounded-lg border border-slate-200/60">No pieces added yet. Select a piece above and click "+ Add".</p>`;
+        if (countEl) countEl.innerText = '0 items added';
+        if (totalEl) totalEl.innerText = `${config.currency}0`;
+        return;
+      }
+
+      const totalItems = currentOrderCart.reduce((sum, item) => sum + item.qty, 0);
+      const grandTotal = currentOrderCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+      container.innerHTML = currentOrderCart.map((item, idx) => `
+        <div class="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200 text-xs shadow-sm">
+          <div class="truncate mr-2">
+            <span class="font-bold text-slate-800">${escapeHtml(item.title)}</span>
+            <span class="text-[10px] text-slate-400 font-mono ml-1">(${escapeHtml(item.sku)})</span>
+            <div class="text-[11px] text-amber-800 font-semibold">${config.currency}${item.price} × ${item.qty} = ${config.currency}${(item.price * item.qty).toFixed(2)}</div>
+          </div>
+          <button type="button" onclick="removeOrderCartItem(${idx})" title="Remove Piece" class="p-1 hover:text-rose-600 text-slate-400 text-xs font-bold flex-shrink-0">
+            ✕
+          </button>
+        </div>
+      `).join('');
+
+      if (countEl) countEl.innerText = `${totalItems} piece(s) across ${currentOrderCart.length} item type(s)`;
+      if (totalEl) totalEl.innerText = `${config.currency}${grandTotal.toLocaleString()}`;
+    }
+
+    function handleSaveOrder(e) {
+      e.preventDefault();
+
+      if (currentOrderCart.length === 0) {
+        showToast('Please add at least 1 jewelry item to the order');
+        return;
+      }
+
+      // Deduct stock for all ordered products
+      currentOrderCart.forEach(cartItem => {
+        const prod = products.find(p => p.id === cartItem.id);
+        if (prod) {
+          prod.stock = Math.max(0, prod.stock - cartItem.qty);
+        }
+      });
       saveProducts();
+
+      const grandTotal = currentOrderCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
       const newOrder = {
         id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -1306,8 +1403,8 @@
         phone: document.getElementById('order-phone').value.trim(),
         handle: document.getElementById('order-handle').value.trim(),
         address: document.getElementById('order-address').value.trim(),
-        items: [{ id: prod.id, title: prod.title, qty: qty, price: prod.sellingPrice }],
-        total: prod.sellingPrice * qty,
+        items: [...currentOrderCart],
+        total: grandTotal,
         paymentStatus: document.getElementById('order-payment').value,
         fulfillmentStatus: document.getElementById('order-status').value,
         courier: document.getElementById('order-courier').value.trim(),
@@ -1317,7 +1414,7 @@
       orders.push(newOrder);
       saveOrders();
       closeOrderModal();
-      showToast('Order logged & stock auto-deducted!');
+      showToast(`Order logged with ${currentOrderCart.length} item(s) & stock updated!`);
     }
 
     function deleteOrder(id) {
